@@ -49,6 +49,7 @@ export function AuthUnifiedForm() {
     setStatusMessage(null);
     setDisabledButtonClickReason(null);
     setErrors({});
+    setTouched({});
     router.replace(`/auth?mode=${newMode}`, { scroll: false });
   };
 
@@ -143,23 +144,58 @@ export function AuthUnifiedForm() {
   const isFormValid =
     mode === 'login' ? isLoginFormValid : mode === 'activate' ? isActivateFormValid : isResetFormValid;
 
-  // Handle Disabled Button Click (Step 7: Explain itself rather than silently refusing)
-  const handleDisabledClick = () => {
+  // Trigger complete validation across all fields and explain blockers (Step 7)
+  const triggerValidationAndExplain = () => {
+    // 1. Mark all fields as touched
+    setTouched({
+      phone: true,
+      pin: true,
+      studentId: true,
+      slipCode: true,
+      terms: true,
+    });
+
+    // 2. Validate every relevant field for the current active mode
+    const newErrors: FormErrors = {};
+    const phoneErr = validateField('phone', phone);
+    if (phoneErr) newErrors.phone = phoneErr;
+
+    if (mode === 'login') {
+      const pinErr = validateField('pin', pin);
+      if (pinErr) newErrors.pin = pinErr;
+    } else if (mode === 'activate') {
+      const studentErr = validateField('studentId', studentId);
+      if (studentErr) newErrors.studentId = studentErr;
+
+      const slipErr = validateField('slipCode', slipCode);
+      if (slipErr) newErrors.slipCode = slipErr;
+
+      const termsErr = validateField('terms', acceptTerms);
+      if (termsErr) newErrors.terms = termsErr;
+    }
+
+    setErrors(newErrors);
+
+    // 3. Set top-level explanatory alert banner
     if (mode === 'activate' && !acceptTerms) {
       setDisabledButtonClickReason('Please review and accept the Terms & Conditions before activating.');
-    } else if (mode === 'activate' && slipCode.length !== 6) {
-      setDisabledButtonClickReason('Please enter the 6-digit access code printed on your paper slip.');
-    } else if (mode === 'login' && pin.length !== 4) {
-      setDisabledButtonClickReason('Please enter your complete 4-digit security PIN to proceed.');
-    } else if (phone.length < 10) {
-      setDisabledButtonClickReason('Please enter a valid 10 or 11-digit parent phone number.');
+    } else if (phoneErr) {
+      setDisabledButtonClickReason(phoneErr);
+    } else if (mode === 'login' && newErrors.pin) {
+      setDisabledButtonClickReason(newErrors.pin);
+    } else if (mode === 'activate' && newErrors.slipCode) {
+      setDisabledButtonClickReason(newErrors.slipCode);
+    } else if (mode === 'activate' && newErrors.studentId) {
+      setDisabledButtonClickReason(newErrors.studentId);
+    } else {
+      setDisabledButtonClickReason('Please complete all required fields correctly to proceed.');
     }
   };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!isFormValid) {
-      handleDisabledClick();
+      triggerValidationAndExplain();
       return;
     }
 
@@ -543,13 +579,16 @@ export function AuthUnifiedForm() {
           )}
 
           {/* Submit Button (Step 7: Disabled until valid, explains itself on click) */}
-          <div
-            onClick={!isFormValid ? handleDisabledClick : undefined}
-            style={{ width: '100%', marginTop: '0.5rem' }}
-          >
+          <div style={{ width: '100%', marginTop: '0.5rem' }}>
             <button
               type="submit"
-              disabled={!isFormValid}
+              aria-disabled={!isFormValid}
+              onClick={(e) => {
+                if (!isFormValid) {
+                  e.preventDefault();
+                  triggerValidationAndExplain();
+                }
+              }}
               className="text-label-large"
               style={{
                 width: '100%',
