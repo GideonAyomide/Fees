@@ -1,0 +1,26 @@
+=== TASK TWO STEP 6: WRITE SUCCEEDED EVIDENCE (201 CREATED) ===
+Captured: 2026-10-30T19:48:32+01:00
+Environment: Next.js 15.1.0 App Router with Neon PostgreSQL backend
+
+--- TERMINAL SERVER LOG OUTPUT ---
+> fees@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.1.0
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.196:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 13s
+ ○ Compiling /enquiry ...
+ ✓ Compiled /enquiry in 18.4s (604 modules)
+ GET /enquiry 200 in 19332ms
+ ○ Compiling /api/enquiry ...
+ ✓ Compiled /api/enquiry in 1159ms (610 modules)
+ POST /api/enquiry 201 in 4020ms
+
+--- STATUS CODE VERIFICATION ---
+1. Status Code: HTTP 201 Created (Returned on POST /api/enquiry).
+2. Meaning: A 201 status code confirms that the resource was not merely received, but successfully created and persisted in the durable database with a server-assigned primary key (ID) and timestamp.
+3. Verification: Contrast with 200 OK (generic acknowledgement without guaranteed persistence) and 500 (captured in evidence/13 when database is disconnected).
