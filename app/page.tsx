@@ -1,4 +1,18 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+
+export const metadata: Metadata = {
+  title: 'Home',
+  description: 'Official school fee balances and receipts for registered families.',
+  keywords: [
+    'Crown Heights Academy',
+    'School Fees',
+    'Term Balance',
+    'Parent Portal',
+    'Official Receipts',
+  ],
+};
 
 export default function HomePage() {
   return (
@@ -9,41 +23,67 @@ export default function HomePage() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '24px 16px',
+        padding: '2rem 1rem',
         backgroundColor: 'var(--color-surface)',
       }}
     >
       <div
         style={{
           width: '100%',
-          maxWidth: '440px',
+          maxWidth: '28rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          gap: '24px',
+          gap: '1.5rem',
         }}
       >
-        {/* Institutional Header */}
-        <header style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <span
-            className="text-label-medium"
+        {/* Linked Institutional Logo / Crest (Item 6: Logo links home) */}
+        <Link
+          href="/"
+          aria-label="Crown Heights Academy Home"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.15s ease',
+          }}
+        >
+          <div
             style={{
-              color: 'var(--color-on-surface-variant)',
-              letterSpacing: 'var(--typography-label-medium-letter-spacing)',
-              textTransform: 'uppercase',
+              width: '3.5rem',
+              height: '3.5rem',
+              borderRadius: '0.75rem',
+              backgroundColor: 'var(--color-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'var(--shadow-soft)',
             }}
           >
-            Crown Heights Academy
-          </span>
+            <span style={{ fontSize: '1.75rem' }} role="img" aria-label="Crown Crest">
+              👑
+            </span>
+          </div>
+        </Link>
+
+        {/* Header with Responsive Clamp & Balanced Wrap (Items 1, 3 & 7) */}
+        <header style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {/* Note: Redundant uppercase subtitle removed per Item 1 */}
           <h1
             className="text-headline-large"
             style={{
               color: 'var(--color-on-surface)',
+              fontSize: 'clamp(1.75rem, 5vw + 0.5rem, 2.375rem)',
+              lineHeight: 1.2,
               letterSpacing: 'var(--typography-headline-large-letter-spacing)',
+              maxWidth: '20rem',
+              margin: '0 auto',
+              textWrap: 'balance',
             }}
           >
-            School Fees & Records
+            School Fees &amp; Official Records
           </h1>
         </header>
 
@@ -52,65 +92,59 @@ export default function HomePage() {
           className="text-body-large"
           style={{
             color: 'var(--color-on-surface-variant)',
-            maxWidth: '360px',
+            maxWidth: '22rem',
             lineHeight: 'var(--typography-body-large-line-height)',
+            fontSize: '1rem',
           }}
         >
           Check your verified term balance, view official receipts, and make secure fee payments for your registered children.
         </p>
 
-        {/* Action Buttons */}
+        {/* Actions Container: Collapsed Choice (Item 2) & Rem-Padded Buttons (Items 4, 5, 6) */}
         <div
           style={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            gap: '12px',
-            marginTop: '8px',
+            gap: '0.875rem',
+            marginTop: '0.5rem',
           }}
         >
+          {/* Collapsed Unified Primary Action (Item 2): Replaces separate Login & Activate buttons */}
           <button
             type="button"
             className="text-label-large"
             style={{
               width: '100%',
-              padding: '16px 20px',
+              padding: '0.9375rem 1.5rem',
               backgroundColor: 'var(--color-primary)',
               color: 'var(--color-on-primary)',
-              borderRadius: '12px',
+              border: 'none',
+              borderRadius: '0.75rem',
               boxShadow: 'var(--shadow-soft)',
-              transition: 'box-shadow 0.2s ease',
+              cursor: 'pointer',
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
             }}
           >
-            Sign In with Phone &amp; PIN
+            Sign In or Activate with Phone
           </button>
 
-          <button
-            type="button"
-            className="text-label-large"
-            style={{
-              width: '100%',
-              padding: '14px 20px',
-              backgroundColor: 'var(--color-surface-container)',
-              color: 'var(--color-on-surface)',
-              border: '1px solid var(--color-outline)',
-              borderRadius: '12px',
-            }}
-          >
-            Activate Account with Slip Code
-          </button>
-
+          {/* Secondary Action: Ask the School */}
           <Link
             href="/enquiry"
             className="text-label-large"
             style={{
               width: '100%',
-              padding: '12px 20px',
+              padding: '0.875rem 1.5rem',
+              backgroundColor: 'var(--color-surface-container)',
               color: 'var(--color-primary)',
+              border: '1px solid var(--color-outline)',
+              borderRadius: '0.75rem',
               textDecoration: 'none',
-              borderRadius: '12px',
               textAlign: 'center',
               display: 'block',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease',
             }}
           >
             Have a question? Ask the School →
@@ -118,7 +152,7 @@ export default function HomePage() {
         </div>
 
         {/* Bursar Official Record Notice */}
-        <footer style={{ marginTop: '16px' }}>
+        <footer style={{ marginTop: '1rem' }}>
           <p
             className="text-body-small"
             style={{
@@ -133,4 +167,3 @@ export default function HomePage() {
     </main>
   );
 }
-
