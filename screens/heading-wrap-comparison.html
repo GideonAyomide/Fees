@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heading Wrap Comparison — Step 10 Information Design</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+    .header-panel {
+      text-align: center;
+      max-width: 800px;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .card {
+      background: var(--color-surface-container);
+      border-radius: 16px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      border: 1px solid var(--color-outline-variant);
+    }
+    .card.bad {
+      border-color: var(--color-error);
+    }
+    .card.good {
+      border-color: var(--color-primary);
+    }
+    .tag {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    .tag.bad {
+      background-color: #FEE2E2;
+      color: #991B1B;
+    }
+    .tag.good {
+      background-color: #DBEAFE;
+      color: #1E40AF;
+    }
+    /* BAD WRAP STYLING: Unconstrained container causing orphan word */
+    .heading-bad {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      line-height: 1.2;
+      width: 275px; /* Deliberate width that causes "Records" orphan */
+      margin: 0 auto;
+      border: 1px dashed #EF4444;
+      padding: 8px;
+    }
+    /* GOOD WRAP STYLING: Balanced width creating 2-line pyramid */
+    .heading-good {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      line-height: 1.2;
+      max-width: 20rem;
+      margin: 0 auto;
+      text-wrap: balance;
+      border: 1px dashed #3B82F6;
+      padding: 8px;
+    }
+    .explanation {
+      font-size: 14px;
+      color: var(--color-on-surface-variant);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-panel">
+    <span class="text-label-medium" style="color: var(--color-primary); text-transform: uppercase;">Task Two Step 10 Evidence</span>
+    <h1 style="margin: 8px 0 12px 0;">Heading Wrap Comparison</h1>
+    <p class="explanation">Demonstrating deliberate heading containment vs. unconstrained orphan typography.</p>
+  </div>
+
+  <div class="comparison-grid">
+    <!-- 18-heading-wrap-bad -->
+    <div class="card bad" id="capture-bad">
+      <span class="tag bad">18-heading-wrap-bad.png</span>
+      <h2 style="font-size: 16px; margin: 0; color: #991B1B;">Awkward / Broken Wrap</h2>
+      <div class="heading-bad">
+        School Fees &amp; Official Records
+      </div>
+      <p class="explanation">
+        <strong>The Defect:</strong> Without intentional width constraints, "Records" drops to an isolated third line as an awkward orphan word, wasting vertical space and creating ragged visual imbalance.
+      </p>
+    </div>
+
+    <!-- 19-heading-wrap-good -->
+    <div class="card good" id="capture-good">
+      <span class="tag good">19-heading-wrap-good.png</span>
+      <h2 style="font-size: 16px; margin: 0; color: #1E40AF;">Balanced / Deliberate Wrap</h2>
+      <div class="heading-good">
+        School Fees &amp; Official Records
+      </div>
+      <p class="explanation">
+        <strong>The Solution:</strong> Using <code>max-width: 20rem</code> and <code>text-wrap: balance</code>, the headline breaks evenly into a stable 2-line pyramid ("School Fees &amp;" / "Official Records") that guides eye flow directly to the CTA.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

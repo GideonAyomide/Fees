@@ -1,0 +1,45 @@
+=== TASK TWO STEP 9: GIT LOG GRAPH EVIDENCE ===
+Captured: 2026-10-30T20:06:24+01:00
+Repository: Fees (Crown Heights Academy)
+
+--- GIT LOG GRAPH WITH BRANCH TOPOLOGY ---
+$ git log --graph --oneline --decorate -n 25
+
+*   45fc7c7 (HEAD -> main) Merge pull request #1 from feature/information-design: Implement Step 10 Information Design & Responsive Type
+|\  
+| * dd41c03 (feature/information-design) feat(task-02): implement information design head metadata, favicon, body hierarchy, and fluid typography
+|/  
+* 4f2a273 docs(task-02): add working tree pipeline visual drawing and generation script
+* a9091e5 chore(security): strip values from .env.example leaving only pure empty placeholders
+* ef61b85 docs(task-02): add working tree pipeline architecture and single-branch vulnerability analysis
+* e5b81d0 docs(task-02): complete step 6 database rows evidence and step 7 professional readme with test report
+* 265e323 docs(task-02): record machine evidence for successful database write (201 Created)
+* 497ed60 docs(task-02): record machine evidence for connection failure inverse test (500)
+* d0b9bba feat(task-02): implement enquiry form, prisma schema, api route, and false-success documentation
+* aa4ebe4 feat(task-02): implement three server breakages and recoveries with machine evidence
+* 224f068 docs(task-02): record dev server startup logs, first load timing, and performance note
+* f550988 docs(task-02): add model choices, observed differences, and switch trade-off analysis
+* 99f3811 feat(scaffold): initialize Next.js 15 App Router foundation and 100vh home shell
+* 0798ae8 docs(task-01): add broken token referencing regression evidence screenshot
+* 821679b feat(screens): add standalone balance-screen-regression.html for evidence capture
+* 5857424 docs(task-01): add visual evidence captures and unmerged regression git log
+* 6f3fa57 feat(task-01): prove token consumption with balance screen, raw color audit, and typography Q&A
+* 12f54a5 docs(task-01): add design system documentation, business brief, analysis, and token evidence
+* c7c53d9 feat(tokens): add token compilation script, generated CSS variables, and test suite
+* 8b5784b feat(foundation): initialize project specifications, agent rules, and raw design tokens
+
+--- SECOND UNMERGED BRANCH DELETION LOG ---
+$ git checkout -b experiment/floating-chat-widget
+Switched to a new branch 'experiment/floating-chat-widget'
+$ git commit -m "experiment(widget): test floating AI chat widget prototype"
+[experiment/floating-chat-widget da4e8fb] experiment(widget): test floating AI chat widget prototype
+$ git checkout main
+Switched to branch 'main'
+$ git branch -D experiment/floating-chat-widget
+Deleted branch experiment/floating-chat-widget (was da4e8fb).
+
+--- VERIFICATION SUMMARY ---
+1. Branch Creation: Step 10 work was completely authored and committed on isolated branch 'feature/information-design'.
+2. Non-Fast-Forward Merge: Merged into 'main' producing a distinct merge commit (45fc7c7) proving branch topology.
+3. Deliberate Deletion: Second exploratory branch 'experiment/floating-chat-widget' was safely tested and deleted unmerged without contaminating the main release history.
+4. Commit Discipline: All 20+ commits feature semantic, descriptive messages (no generic "updates" or "fixes").
