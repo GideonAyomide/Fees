@@ -11,9 +11,10 @@ Crown Heights Academy Fees is an installable, low-bandwidth web application for 
   * Foundational Next.js 15 App Router scaffold and 100vh minimal institutional home shell.
   * Deliberate server breakage diagnostics and recovery procedures (nested directories, port collisions, and custom brand 404 handler).
   * Database persistence verification with `Enquiry` model on PostgreSQL/Neon returning `HTTP 201 Created` with authentic timestamps and connection failure handling returning `HTTP 500`.
+  * Unified single-page parent authentication architecture (`/auth?mode=login|activate|reset`) with 0ms transition, 4-category client validation, accessible ARIA announcements with yellow caution icons (`⚠️`), mobile numeric input mode, and direct HTTP attack demonstration.
 * **Half Done**:
   * Parent enquiry workflow (UI form and API endpoint functional; staff review notifications and responses scheduled for subsequent tasks).
-  * Parent authentication architecture (phone + PIN sign-in and activation slip flow specified in PRD, awaiting session middleware implementation).
+  * Server-side authentication & security enforcement (Task Four: Argon2id slow hashing, forward-only migrations, rate limiting, and breached password defense).
 * **Not Started**:
   * Flutterwave Standard checkout integration and webhook signature verification (gated behind pilot launch checks).
   * pgvector semantic similarity search and keyword guard pipeline for school policy rules.
