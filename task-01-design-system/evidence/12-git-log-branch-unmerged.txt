@@ -1,0 +1,24 @@
+=== GIT LOG PROVING REGRESSION BRANCH UNMERGED ===
+
+1. Active Branches (Branch was deleted, only main exists):
+* main
+
+2. Main Git Log Graph (Proving regression commit 626e831 is NOT in main history):
+* 6f3fa57 feat(task-01): prove token consumption with balance screen, raw color audit, and typography Q&A
+* 12f54a5 docs(task-01): add design system documentation, business brief, analysis, and token evidence
+* c7c53d9 feat(tokens): add token compilation script, generated CSS variables, and test suite
+* 8b5784b feat(foundation): initialize project specifications, agent rules, and raw design tokens
+
+3. Git Reflog (Proving Branch Creation, Regression Commit, Return to Main, and Deletion):
+6f3fa57 HEAD@{0}: checkout: moving from experiment/deliberate-regression to main
+626e831 HEAD@{1}: commit: test(regression): deliberately break token referencing by pointing color-primary to raw hex
+6f3fa57 HEAD@{2}: checkout: moving from main to experiment/deliberate-regression
+6f3fa57 HEAD@{3}: commit: feat(task-01): prove token consumption with balance screen, raw color audit, and typography Q&A
+12f54a5 HEAD@{4}: commit: docs(task-01): add design system documentation, business brief, analysis, and token evidence
+c7c53d9 HEAD@{5}: commit: feat(tokens): add token compilation script, generated CSS variables, and test suite
+8b5784b HEAD@{6}: commit (initial): feat(foundation): initialize project specifications, agent rules, and raw design tokens
+
+4. Technical Analysis & The Three Sentences on Token Referencing:
+- When a component or color role is hardcoded directly to a raw hex code rather than referencing a primitive token alias, it severs the automated cascade linking design intent to code.
+- Changing the brand primary color at the source successfully updated the primary container to the new emerald palette, but the unlinked Pay button remained stranded on the obsolete royal blue, instantly destroying brand harmony and visual cohesion.
+- Token referencing is the only mechanism that ensures a single change at the source of truth propagates predictably throughout the entire system without requiring error-prone manual audits across individual component files.
