@@ -26,3 +26,4 @@ Event 3: Parent clicked "Sign In" tab
 1. Zero Page Reload: Document remains mounted throughout user tab switching.
 2. Zero Session Churn: No session creation or session token invalidation occurs during mode switching.
 3. Bandwidth Conservation: Zero bytes downloaded over cellular connection while switching intent.
+

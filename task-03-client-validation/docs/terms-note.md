@@ -20,3 +20,4 @@ In our initial component layout, we identified a non-functional decorative eleme
   3. **Visual Clutter**: The primary school crest logo already sits prominently outside the card header and actively links home (`/`). Stacking a second watermark inside the form added visual noise on narrow 320px mobile displays.
 
 Removing the internal watermark reduced DOM complexity, cleaned up the TalkBack focus sequence, and focused 100% of the parent's attention on entering their phone number.
+

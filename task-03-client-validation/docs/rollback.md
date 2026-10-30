@@ -46,3 +46,4 @@ $ git revert 2c78d63 --no-edit
 Naming the specific commit SHA is deterministic and mathematically precise: Git calculates the exact inverse diff of that targeted snapshot and creates an atomic compensating commit without touching unrelated code.
 
 In contrast, asking an agent in words to "undo the last change" invites hallucination: the model reconstructs state from memory, frequently overwriting unrelated edits, dropping adjacent hotfixes, or leaving behind phantom orphan variables.
+

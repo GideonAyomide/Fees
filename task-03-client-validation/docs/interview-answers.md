@@ -190,3 +190,4 @@ the attacker can harvest a complete directory of registered parents.
 **The Fix**: Authentication endpoints must return generic, constant-time error messages (e.g., *"Incorrect phone number or security PIN"*), ensuring failed responses are indistinguishable.
 
 *(89 words)*
+

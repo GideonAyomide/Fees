@@ -16,3 +16,4 @@ EFFICIENCY GAIN:
 - Route reduction: Decreased from 5 pages to 3 pages (40% reduction in route complexity).
 - Network cost: Switching between Login, Activation, and Reset performs zero network requests and zero page reloads. State switches in 0ms on the client via React shallow URL synchronization (`window.history.pushState` / Next.js `useRouter.replace`).
 - State continuity: If a parent types their phone number in the Login tab and clicks "Activate account", their typed phone number is retained in component memory without re-typing.
+

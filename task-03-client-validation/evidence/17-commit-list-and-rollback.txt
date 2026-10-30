@@ -31,3 +31,4 @@ $ git log --oneline -n 3
 --- WHY NAMING THE ID BEATS DESCRIBING IN WORDS ---
 Naming the specific commit SHA is deterministic and mathematically precise: Git calculates the exact inverse diff of the targeted snapshot and creates an atomic compensating commit.
 In contrast, asking an AI agent in natural language to "undo the last change" invites hallucination: the agent reconstructs the previous state from memory, frequently overwriting unrelated edits, dropping subtle bugfixes, or leaving behind phantom orphan variables.
+

@@ -24,3 +24,4 @@ Test 4: Rapid Multi-Click Submission
 - Action: Filled valid fields and clicked the submit button 6 times in 500 milliseconds on a throttled connection.
 - Result: 6 separate POST requests dispatched in parallel; client UI lacked an in-flight debounce lock.
 - Defense Assessment: Client-side gating fails under rapid concurrent mouse events.
+

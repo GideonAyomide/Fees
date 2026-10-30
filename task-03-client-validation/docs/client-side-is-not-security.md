@@ -78,3 +78,4 @@ In Task Four (*The Server Is the Source of Truth*), we will close this vulnerabi
 3. **Cryptographic Slow Hashing**: Replace naive comparisons with Argon2id hashing for PINs and access secrets.
 4. **Rate Limiting at the Network Edge**: Implement sliding-window rate limiting keyed by client IP and phone number to throttle automated bot enumeration.
 5. **Re-Testing the Attack**: We will replay this identical command-line request in Task Four and prove that the server rejects it with an explicit `400 Bad Request` or `422 Unprocessable Entity`.
+

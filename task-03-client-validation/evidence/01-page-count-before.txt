@@ -14,3 +14,4 @@ TOTAL ROUTE PAGE COUNT (BEFORE): 5 distinct server routes.
 ANALYSIS:
 Each authentication sub-flow lived in its own folder under `app/auth/` (`app/auth/login/page.tsx`, `app/auth/activate/page.tsx`, `app/auth/reset/page.tsx`).
 Switching between Login, Activation, and Reset required full HTTP document roundtrips, browser navigation reloads, and multi-second bundle re-fetching over slow 3G mobile connections.
+

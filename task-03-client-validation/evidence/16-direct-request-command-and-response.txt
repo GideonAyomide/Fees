@@ -27,3 +27,4 @@ Invoke-RestMethod -Uri http://localhost:3000/api/auth/activate -Method Post -Con
 4. Slip Code: Accepted 2-digit code "00" despite client rules requiring 6 digits.
 5. Terms Acceptance: The server provisioned the account with "acceptTerms": false despite the client disabling the submit button until checked.
 6. Conclusion: Proves conclusively that client-side validation is solely an interface convenience for cooperative users, providing exactly zero security against automated tools or direct HTTP requests.
+

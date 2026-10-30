@@ -102,7 +102,7 @@ export function AuthUnifiedForm() {
   };
 
   const handlePinChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const cleaned = e.target.value.replace(/\D/g, '').slice(4);
+    const cleaned = e.target.value.replace(/\D/g, '').slice(0, 4);
     setPin(cleaned);
     if (touched.pin) {
       setErrors((prev) => ({ ...prev, pin: validateField('pin', cleaned) }));
@@ -111,7 +111,7 @@ export function AuthUnifiedForm() {
   };
 
   const handleSlipCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const cleaned = e.target.value.replace(/\D/g, '').slice(6);
+    const cleaned = e.target.value.replace(/\D/g, '').slice(0, 6);
     setSlipCode(cleaned);
     if (touched.slipCode) {
       setErrors((prev) => ({ ...prev, slipCode: validateField('slipCode', cleaned) }));
@@ -573,3 +573,4 @@ export function AuthUnifiedForm() {
     </main>
   );
 }
+

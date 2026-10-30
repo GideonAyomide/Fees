@@ -48,3 +48,4 @@ This document records a manual audit of the Crown Heights Academy authentication
 
 ### After Fixes:
 > *"Parent Phone Number, required, edit, blank. Leaving Parent Phone Number. Alert: Warning symbol, Phone number cannot be left blank. Student Admission Number, required, edit. Access Slip Code, required, edit. Enter the code from your printed fee advice slip. Checkbox, unchecked, required, I confirm I am the registered parent/guardian. Submit Button, disabled. Activating button: Alert: Warning symbol, Please review and accept the Terms & Conditions before activating."*
+

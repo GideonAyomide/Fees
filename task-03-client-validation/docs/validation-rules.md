@@ -62,3 +62,4 @@ Every validation rule in Crown Heights Academy Fees has been derived directly fr
 * **What Breaks Without It**: Non-compliance with the Nigeria Data Protection Act (NDPA), exposing the school to regulatory fines for displaying child ledger data without guardian consent.
 * **Who It Wrongly Blocks**: Parents with visual or motor impairments navigating on small touchscreens where clicking an un-enlarged checkbox target is difficult.
 * **Designing Around the Cost**: We enlarged the touch target to `44x44px`, wrapped the entire explanatory text in an accessible `<label>` element so tapping anywhere on the text toggles the checkbox, and made the disabled button explain the exact requirement when clicked.
+

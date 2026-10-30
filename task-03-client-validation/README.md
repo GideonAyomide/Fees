@@ -50,3 +50,4 @@ Task Three examines the public boundary of web software: forms. It tests whether
 1. **Defenseless Endpoint Exposure**: The activation route accepted malformed bot data via direct HTTP requests because server-side schema validation was deferred to Task Four.
 2. **Missing Submit Lock**: Double-clicking the submit button quickly dispatched duplicate requests on throttled connections.
 3. **International Phone Truncation**: Copy-pasting `+234` numbers stripped the plus sign without re-prefixing `0`, causing valid numbers to fail length checks. Documented in `docs/defects.md`.
+

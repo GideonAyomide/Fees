@@ -45,3 +45,4 @@ Any field failing all three has been ruthlessly removed.
 2. **Parent Home Address**: Removed. The school paper book already holds the residential address; asking for it on login creates unnecessary data collection risk.
 3. **Username / Nickname**: Removed. Phone numbers are unique and eliminate forgotten-username support requests.
 4. **Confirm PIN Field**: Removed on login, replaced with a visibility toggle and strict length gating.
+

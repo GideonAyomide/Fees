@@ -37,3 +37,4 @@ By removing the length hint and returning identical, generic error messages on b
 * **The Cost to Legitimate Users**: Removing `"e.g. 123456"` means a legitimate parent who is looking at a cluttered paper fee slip might wonder: *"Am I supposed to enter the receipt number, the student admission number, or the activation code?"*
 * **How We Mitigated It**: Instead of an explicit digit mask, we provided an unobtrusive textual hint that appears only once typing begins: *"Enter the code from your printed fee advice slip."*
 * **Is It Worth It?**: Yes, 100%. The slip code is the only barrier protecting minors' private financial records and payment histories from public exposure. Hardening the field against automated enumeration is mandatory under our zero-cross-family-exposure security commitment.
+

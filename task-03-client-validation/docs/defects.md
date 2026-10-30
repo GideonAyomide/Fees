@@ -35,3 +35,4 @@ In accordance with Rule 8 of the assessment framework, this document records rea
   High registration drop-off among mobile parents who copy their numbers directly from address books or messaging apps.
 * **Remediation**:
   Add prefix normalization logic: if the string begins with `234`, replace it with standard Nigerian local prefix `0` before applying the 11-digit slice.
+
