@@ -1,0 +1,26 @@
+=== RAW COLOUR VALUE SEARCH ===
+Command:
+Select-String -Path screens\balance-screen.html -Pattern "#[0-9a-fA-F]{3,8}|rgba?\(|hsla?\("
+
+Output:
+
+[EMPTY - 0 MATCHES FOUND]
+
+Explanation:
+The balance screen implementation (screens/balance-screen.html) contains 0 raw hex, rgb, rgba, or hsl color values.
+Every visual element, text, border, surface, container, badge, and button strictly consumes CSS custom properties:
+- var(--color-surface)
+- var(--color-on-surface)
+- var(--color-surface-container)
+- var(--color-surface-container-low)
+- var(--color-surface-container-lowest)
+- var(--color-surface-container-high)
+- var(--color-primary)
+- var(--color-on-primary)
+- var(--color-primary-container)
+- var(--color-on-primary-container)
+- var(--color-on-surface-variant)
+- var(--color-outline)
+- var(--color-outline-variant)
+- var(--color-error-container)
+- var(--color-on-error-container)

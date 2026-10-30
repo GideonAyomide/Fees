@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What do I owe — Fees | Crown Heights Academy</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <style>
+    /* Reset & Base Layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      font-family: var(--typography-body-large-font-family);
+      line-height: var(--typography-body-large-line-height);
+      -webkit-font-smoothing: antialiased;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Bar & Child Switcher */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-outline);
+    }
+
+    .school-title {
+      color: var(--color-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .child-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-surface-container);
+      border: 1px solid var(--color-outline);
+      border-radius: 8px;
+      padding: 6px 12px;
+      color: var(--color-on-surface);
+      cursor: pointer;
+    }
+
+    /* Date Line & Notice */
+    .status-banner {
+      background-color: var(--color-surface-container-low);
+      border-left: 3px solid var(--color-primary);
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+
+    .posted-date {
+      color: var(--color-on-surface);
+      font-weight: var(--typography-body-medium-font-weight);
+    }
+
+    .official-notice {
+      color: var(--color-on-surface-variant);
+      margin-top: 2px;
+    }
+
+    /* Primary Balance Card */
+    .balance-card {
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+      padding: 24px 20px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .balance-label {
+      color: var(--color-on-primary-container);
+      opacity: 0.85;
+    }
+
+    .balance-amount {
+      color: var(--color-on-primary-container);
+      letter-spacing: var(--typography-display-small-letter-spacing);
+    }
+
+    .pending-alert {
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      border: 1px solid var(--color-outline);
+    }
+
+    /* Fee Breakdown Section */
+    .breakdown-section {
+      background-color: var(--color-surface-container-lowest);
+      border: 1px solid var(--color-outline);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-header {
+      color: var(--color-on-surface);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-outline-variant);
+    }
+
+    .item-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .fee-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--color-outline-variant);
+    }
+
+    .fee-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-title {
+      color: var(--color-on-surface);
+    }
+
+    .item-due {
+      color: var(--color-on-surface-variant);
+    }
+
+    .item-pricing {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .item-amount {
+      color: var(--color-on-surface);
+      font-weight: 600;
+    }
+
+    .badge-overdue {
+      background-color: var(--color-error-container);
+      color: var(--color-on-error-container);
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Actions */
+    .actions-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: var(--color-on-primary);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-family: inherit;
+      font-weight: var(--typography-label-large-font-weight);
+      font-size: var(--typography-label-large-font-size);
+      line-height: var(--typography-label-large-line-height);
+      letter-spacing: var(--typography-label-large-letter-spacing);
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      text-align: center;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--color-primary);
+      border: 1px solid var(--color-outline);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: inherit;
+      font-weight: var(--typography-label-large-font-weight);
+      font-size: var(--typography-label-large-font-size);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--color-surface-container-high);
+    }
+
+    .footer-help {
+      text-align: center;
+      color: var(--color-on-surface-variant);
+      padding: 12px 0 24px;
+    }
+
+    .footer-help a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <main class="app-container">
+    <!-- Top Bar with School & Child Switcher -->
+    <header class="top-bar">
+      <span class="school-title text-label-small">Crown Heights Academy</span>
+      <div class="child-switcher text-label-medium" role="button" aria-haspopup="true" aria-label="Selected child: Chidi Adebayo, JSS 2A">
+        <span>Chidi Adebayo (JSS 2A)</span>
+        <span aria-hidden="true">▾</span>
+      </div>
+    </header>
+
+    <!-- Bursar Posted Up To Line (PRD 6.2.2 & 6.2.6) -->
+    <section class="status-banner" aria-label="Ledger status">
+      <p class="posted-date text-body-medium">The bursar's book is posted up to 28 Oct 2026.</p>
+      <p class="official-notice text-body-small">The bursar's book is the official record. If this looks wrong, tap Talk to a person.</p>
+    </section>
+
+    <!-- Primary Balance Card (PRD 6.2.1) -->
+    <section class="balance-card" aria-labelledby="total-balance-heading">
+      <span id="total-balance-heading" class="balance-label text-title-medium">Total Outstanding Balance</span>
+      <div class="balance-amount text-display-small">₦145,000</div>
+      
+      <!-- Pending Verification Notice (PRD 6.2.10) -->
+      <div class="pending-alert text-body-small">
+        A payment of ₦25,000 is waiting to be checked. Reference FLW-294810.
+      </div>
+    </section>
+
+    <!-- Fee Item Breakdown (PRD 6.2.1 & 6.2.5) -->
+    <section class="breakdown-section" aria-labelledby="breakdown-heading">
+      <h2 id="breakdown-heading" class="section-header text-title-medium">Fee Breakdown & Due Dates</h2>
+      
+      <ul class="item-list">
+        <!-- Item 1: Overdue tuition item -->
+        <li class="fee-item">
+          <div class="item-info">
+            <span class="item-title text-body-large">Term 1 Tuition Fee</span>
+            <span class="item-due text-body-small">Due 15 Oct 2026</span>
+          </div>
+          <div class="item-pricing">
+            <span class="item-amount text-body-large">₦95,000</span>
+            <span class="badge-overdue text-label-small">Overdue</span>
+          </div>
+        </li>
+
+        <!-- Item 2: Development Levy -->
+        <li class="fee-item">
+          <div class="item-info">
+            <span class="item-title text-body-large">School Development Levy</span>
+            <span class="item-due text-body-small">Due 10 Nov 2026</span>
+          </div>
+          <div class="item-pricing">
+            <span class="item-amount text-body-large">₦30,000</span>
+          </div>
+        </li>
+
+        <!-- Item 3: Science & Computer Lab Fee -->
+        <li class="fee-item">
+          <div class="item-info">
+            <span class="item-title text-body-large">Science Lab & Tech Levy</span>
+            <span class="item-due text-body-small">Due 10 Nov 2026</span>
+          </div>
+          <div class="item-pricing">
+            <span class="item-amount text-body-large">₦20,000</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Action Buttons (PRD 6.5 & 6.6) -->
+    <nav class="actions-group" aria-label="Page actions">
+      <button class="btn-primary" type="button">Pay School Fees (₦145,000)</button>
+      <button class="btn-secondary" type="button">Talk to a person</button>
+    </nav>
+
+    <!-- Footer Support Link -->
+    <footer class="footer-help text-body-small">
+      Need an arrangement or scholarship credit? <a href="#">Ask the school</a>
+    </footer>
+  </main>
+</body>
+</html>

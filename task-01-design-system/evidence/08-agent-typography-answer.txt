@@ -1,0 +1,28 @@
+=== AGENT TYPOGRAPHY AUDIT Q&A ===
+
+QUESTION:
+Which typography style did you use for the total balance amount ("₦145,000") on the balance card, and which typography style did you use for the primary action button ("Pay School Fees")? State the exact token name, font family, font size, line height, letter spacing, and font weight for each.
+
+AGENT ANSWER:
+
+1. Total Outstanding Balance Amount ("₦145,000"):
+- Typography Style: Display Small (.text-display-small)
+- Tokens & Metrics:
+  * Font Family:    Inter, sans-serif (--typography-display-small-font-family)
+  * Font Size:      36px (--typography-display-small-font-size)
+  * Line Height:    44px (~1.22x multiplier) (--typography-display-small-line-height)
+  * Font Weight:    600 (SemiBold) (--typography-display-small-font-weight)
+  * Letter Spacing: -0.72px (-2.0% tracking) (--typography-display-small-letter-spacing)
+- Rationale:
+  While Display Large (57px) exists in our type scale, applying 57px to a six-figure currency number ("₦145,000") causes text wrapping or horizontal clipping on compact 360px-wide mobile viewports. Display Small (36px) delivers clear visual hierarchy and instant recognition for the financial total while fitting comfortably above the screen fold on low-cost Android phones.
+
+2. Primary Action Button ("Pay School Fees (₦145,000)"):
+- Typography Style: Label Large (.text-label-large)
+- Tokens & Metrics:
+  * Font Family:    Inter, sans-serif (--typography-label-large-font-family)
+  * Font Size:      14px (--typography-label-large-font-size)
+  * Line Height:    20px (~1.43x multiplier) (--typography-label-large-line-height)
+  * Font Weight:    500 (Medium) (--typography-label-large-font-weight)
+  * Letter Spacing: -0.14px (-1.0% tracking) (--typography-label-large-letter-spacing)
+- Rationale:
+  In standard Material Design 3 architecture, all interactive buttons consume the Label Large role. The 14px font size paired with 500 Medium weight provides distinct legibility inside standard 48px touch targets without overpowering surrounding card headings.
