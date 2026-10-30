@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Input Trap Demonstration — Step 4</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+    .header-panel {
+      text-align: center;
+      max-width: 800px;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .card {
+      background: var(--color-surface-container);
+      border-radius: 16px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border: 1px solid var(--color-outline-variant);
+    }
+    .card.annoying {
+      border-color: var(--color-error);
+    }
+    .card.proper {
+      border-color: var(--color-primary);
+    }
+    .tag {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      align-self: flex-start;
+    }
+    .tag.annoying {
+      background-color: #FEE2E2;
+      color: #991B1B;
+    }
+    .tag.proper {
+      background-color: #DBEAFE;
+      color: #1E40AF;
+    }
+    input {
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--color-outline);
+      background: var(--color-surface);
+      color: var(--color-on-surface);
+      font-size: 16px;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .explanation {
+      font-size: 14px;
+      color: var(--color-on-surface-variant);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-panel">
+    <span class="text-label-medium" style="color: var(--color-primary); text-transform: uppercase;">Task Three Step 4 Evidence</span>
+    <h1 style="margin: 8px 0 12px 0;">The Number Input Trap vs. Proper Text Input</h1>
+    <p class="explanation">
+      Why using <code>&lt;input type="number"&gt;</code> for phone numbers and slip codes destroys user experience on mobile.
+    </p>
+  </div>
+
+  <div class="comparison-grid">
+    <!-- The Annoying Number Input -->
+    <div class="card annoying">
+      <span class="tag annoying">09-number-input-annoying</span>
+      <h2 style="font-size: 18px; margin: 0; color: #991B1B;">The Trap: &lt;input type="number"&gt;</h2>
+      <label for="annoying-input" style="font-size: 13px; font-weight: 600;">Access Slip Code (Try typing 084920)</label>
+      <input id="annoying-input" type="number" value="0" />
+      <p class="explanation">
+        <strong>The Glitch:</strong>
+        <br>1. Forces an initial <code>0</code> or spinner buttons.
+        <br>2. When you type <code>400</code>, you get <code>0400</code>.
+        <br>3. Strips critical leading zeros (turning a Nigerian phone <code>08012345678</code> into <code>8012345678</code>).
+        <br>4. Mouse wheel or accidental swipe modifies the code!
+      </p>
+    </div>
+
+    <!-- The Proper Text Input -->
+    <div class="card proper">
+      <span class="tag proper">10-text-input-working</span>
+      <h2 style="font-size: 18px; margin: 0; color: #1E40AF;">The Fix: &lt;input type="text" inputMode="numeric"&gt;</h2>
+      <label for="proper-input" style="font-size: 13px; font-weight: 600;">Access Slip Code (Smooth digit entry)</label>
+      <input id="proper-input" type="text" inputmode="numeric" placeholder="Enter slip code" oninput="this.value = this.value.replace(/\D/g, '')" />
+      <p class="explanation">
+        <strong>The Solution:</strong>
+        <br>1. Triggers the clean numeric telephone keypad on mobile phones.
+        <br>2. Preserves leading zeros intact (e.g. <code>080...</code>).
+        <br>3. Zero spinner arrows, zero default numbers, and zero accidental scrollwheel mutations.
+      </p>
+    </div>
+  </div>
+
+  <div style="max-width: 900px; width: 100%; background: var(--color-surface-container); padding: 24px; border-radius: 12px; border: 1px solid var(--color-outline-variant);">
+    <h3 style="margin-top: 0; font-size: 16px;">Where &lt;input type="number"&gt; is the Correct Choice:</h3>
+    <p class="explanation" style="margin-bottom: 0;">
+      An <code>&lt;input type="number"&gt;</code> is the correct choice only when the data represents an actual quantitative measurement or adjustable scalar that can be incrementally stepped up or down with arithmetic meaning (such as selecting a quantity of tickets, a student's age, or item counts), rather than an identity token or code where leading zeros matter.
+    </p>
+  </div>
+</body>
+</html>

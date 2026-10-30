@@ -111,8 +111,8 @@ export default function HomePage() {
           }}
         >
           {/* Collapsed Unified Primary Action (Item 2): Replaces separate Login & Activate buttons */}
-          <button
-            type="button"
+          <Link
+            href="/auth"
             className="text-label-large"
             style={{
               width: '100%',
@@ -123,11 +123,14 @@ export default function HomePage() {
               borderRadius: '0.75rem',
               boxShadow: 'var(--shadow-soft)',
               cursor: 'pointer',
+              textDecoration: 'none',
+              textAlign: 'center',
+              display: 'block',
               transition: 'transform 0.15s ease, box-shadow 0.15s ease',
             }}
           >
             Sign In or Activate with Phone
-          </button>
+          </Link>
 
           {/* Secondary Action: Ask the School */}
           <Link

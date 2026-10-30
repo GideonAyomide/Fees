@@ -1,0 +1,26 @@
+=== TASK THREE STEP 8: ATTACKING THROUGH THE FORM (BROWSER VECTOR AUDIT) ===
+Captured: 2026-10-30T20:30:00+01:00
+Target Interface: http://localhost:3000/auth
+
+TEST CASES & RESULTS:
+
+Test 1: Single-Token & Short Inputs
+- Action: Typed single digit "8" in phone number, "1" in PIN.
+- Result: Blocked on client. Inline errors ("Phone number must be 10 or 11 digits", "PIN must be exactly 4 digits") and submit button remained disabled.
+- Defense Assessment: Held against cooperative user typing.
+
+Test 2: Whitespace & Space Injection
+- Action: Pasted phone number with leading and trailing spaces: "   08012345678   ".
+- Result: Client sanitization regex stripped non-digits, trimming the spaces automatically.
+- Defense Assessment: Client sanitization successfully normalized the phone input.
+
+Test 3: Browser DOM Element Inspection & Disabled Removal
+- Action: Opened browser Developer Tools (F12 Elements Inspector). Targeted `<button disabled>`. Deleted the `disabled=""` attribute directly from the DOM tree. Clicked the newly enabled button without checking the "Terms & Conditions" checkbox.
+- Result: What Got Through!
+  The client form dispatched the POST request to `/api/auth/activate`. The server accepted the payload and provisioned the account without guardian legal terms acceptance.
+- Finding: Even within the browser, client-side disabled attributes are completely mutable by any user capable of pressing F12.
+
+Test 4: Rapid Multi-Click Submission
+- Action: Filled valid fields and clicked the submit button 6 times in 500 milliseconds on a throttled connection.
+- Result: 6 separate POST requests dispatched in parallel; client UI lacked an in-flight debounce lock.
+- Defense Assessment: Client-side gating fails under rapid concurrent mouse events.

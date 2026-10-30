@@ -1,0 +1,16 @@
+=== TASK THREE STEP 1: PAGE COUNT BEFORE COLLAPSE ===
+Captured: 2026-10-30T20:23:04+01:00
+Architecture: Traditional Multi-Page Authentication Setup
+
+LIST OF PAGES IN APPLICATION (BEFORE):
+1. / (Home - School Fees & Official Records Landing)
+2. /enquiry (Ask the School - Parent Fee Enquiry Form)
+3. /auth/login (Dedicated Sign In Page)
+4. /auth/activate (Dedicated Account Activation Page)
+5. /auth/reset (Dedicated PIN Reset Request Page)
+
+TOTAL ROUTE PAGE COUNT (BEFORE): 5 distinct server routes.
+
+ANALYSIS:
+Each authentication sub-flow lived in its own folder under `app/auth/` (`app/auth/login/page.tsx`, `app/auth/activate/page.tsx`, `app/auth/reset/page.tsx`).
+Switching between Login, Activation, and Reset required full HTTP document roundtrips, browser navigation reloads, and multi-second bundle re-fetching over slow 3G mobile connections.

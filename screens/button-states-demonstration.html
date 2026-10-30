@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Button States Demonstration — Step 7</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+    .header-panel {
+      text-align: center;
+      max-width: 800px;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .card {
+      background: var(--color-surface-container);
+      border-radius: 16px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border: 1px solid var(--color-outline-variant);
+    }
+    .card.hidden-btn {
+      border-color: #94A3B8;
+    }
+    .card.disabled-btn {
+      border-color: var(--color-primary);
+    }
+    .tag {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      align-self: flex-start;
+    }
+    .tag.hidden-btn {
+      background-color: #E2E8F0;
+      color: #334155;
+    }
+    .tag.disabled-btn {
+      background-color: #DBEAFE;
+      color: #1E40AF;
+    }
+    input {
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--color-outline);
+      background: var(--color-surface);
+      color: var(--color-on-surface);
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .alert-box {
+      background-color: #FEF3C7;
+      border: 1px solid #F59E0B;
+      color: #92400E;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .explanation {
+      font-size: 14px;
+      color: var(--color-on-surface-variant);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-panel">
+    <span class="text-label-medium" style="color: var(--color-primary); text-transform: uppercase;">Task Three Step 7 Evidence</span>
+    <h1 style="margin: 8px 0 12px 0;">Button Visibility &amp; Disabled State Explanations</h1>
+    <p class="explanation">Why hiding the button creates confusion, and how a disabled button that explains itself solves the problem.</p>
+  </div>
+
+  <div class="comparison-grid">
+    <!-- 13-button-hidden-version -->
+    <div class="card hidden-btn">
+      <span class="tag hidden-btn">13-button-hidden-version.png</span>
+      <h2 style="font-size: 18px; margin: 0; color: #334155;">The Rejected Pattern: Button Hidden</h2>
+      <label style="font-size: 13px; font-weight: 600;">Parent Phone Number</label>
+      <input type="text" value="08012345678" />
+      <label style="font-size: 13px; font-weight: 600;">Security PIN</label>
+      <input type="password" value="" placeholder="Incomplete PIN..." />
+      
+      <!-- Button is completely removed/hidden -->
+      <div style="border: 2px dashed #CBD5E1; padding: 18px; border-radius: 8px; text-align: center; color: #94A3B8; font-size: 13px;">
+        [Submit Button is Hidden Until Valid]
+      </div>
+
+      <p class="explanation">
+        <strong>Why It Fails:</strong> Users expect to see the primary action. Hiding the button makes the page feel truncated or broken, leaving users wondering whether the page crashed.
+      </p>
+    </div>
+
+    <!-- 14-button-disabled-version -->
+    <div class="card disabled-btn">
+      <span class="tag disabled-btn">14-button-disabled-version.png</span>
+      <h2 style="font-size: 18px; margin: 0; color: #1E40AF;">The Shipped Pattern: Button Explains Itself</h2>
+      <label style="font-size: 13px; font-weight: 600;">Parent Phone Number</label>
+      <input type="text" value="08012345678" />
+      <label style="font-size: 13px; font-weight: 600;">Security PIN</label>
+      <input type="password" value="12" />
+
+      <!-- Explanatory Alert on Disabled Click -->
+      <div class="alert-box">
+        <span>⚠️</span>
+        <span>Please enter your complete 4-digit security PIN to proceed.</span>
+      </div>
+
+      <!-- Disabled Button Visible -->
+      <button style="width: 100%; padding: 12px; background: var(--color-surface-container-high); color: var(--color-on-surface-variant); border: none; border-radius: 8px; font-weight: 600; cursor: not-allowed; opacity: 0.6;">
+        Sign In to Portal (Disabled)
+      </button>
+
+      <p class="explanation">
+        <strong>Why It Wins:</strong> The button anchors the form visually. When clicked, it explains the exact missing requirement rather than silently refusing.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

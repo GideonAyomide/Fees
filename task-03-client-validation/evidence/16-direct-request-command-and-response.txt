@@ -1,0 +1,29 @@
+=== TASK THREE STEP 8: DIRECT REQUEST AROUND THE FORM (BYPASSING BROWSER) ===
+Captured: 2026-10-30T20:31:45+01:00
+Target Endpoint: http://localhost:3000/api/auth/activate
+Method: HTTP POST (Direct terminal invocation bypassing browser DOM & JavaScript validation)
+
+--- COMMAND EXECUTED ---
+Invoke-RestMethod -Uri http://localhost:3000/api/auth/activate -Method Post -ContentType "application/json" -Body '{"phone":"INVALID-BOT-PHONE","studentId":"x","slipCode":"00","acceptTerms":false}' | ConvertTo-Json
+
+--- ACTUAL SERVER RESPONSE (HTTP 200 OK) ---
+{
+    "success":  true,
+    "message":  "Account activation accepted.",
+    "accountStatus":  "PROVISIONED",
+    "dataReceived":  {
+                         "phone":  "INVALID-BOT-PHONE",
+                         "studentId":  "x",
+                         "slipCode":  "00",
+                         "acceptTerms":  false
+                     },
+    "clientRulesEnforcedOnServer":  0
+}
+
+--- AUDIT ANALYSIS ---
+1. Client Rules Enforced: ZERO (0 of 8).
+2. Phone Format: The server accepted "INVALID-BOT-PHONE" despite client rules requiring 10-11 digits.
+3. Student ID: Accepted single character "x" despite client rules requiring at least 4 characters.
+4. Slip Code: Accepted 2-digit code "00" despite client rules requiring 6 digits.
+5. Terms Acceptance: The server provisioned the account with "acceptTerms": false despite the client disabling the submit button until checked.
+6. Conclusion: Proves conclusively that client-side validation is solely an interface convenience for cooperative users, providing exactly zero security against automated tools or direct HTTP requests.
