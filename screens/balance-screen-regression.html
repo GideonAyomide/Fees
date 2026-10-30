@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What do I owe — Broken Token Referencing Regression</title>
+  <style>
+    /* ==========================================================================
+       DEMONSTRATION OF BROKEN TOKEN REFERENCING REGRESSION (STEP 8)
+       
+       1. The brand primary palette was updated at the source to Emerald Green:
+          --primitive-primary-40: #059669;
+          --primitive-primary-90: #d1fae5; (light green container)
+          --primitive-primary-30: #047857; (dark green text)
+       
+       2. Semantic role --color-primary-container still references the palette:
+          --color-primary-container: var(--primitive-primary-90); -> SUCCESSFULLY UPDATES TO GREEN!
+       
+       3. BUT --color-primary was broken to a raw hex code:
+          --color-primary: #2563eb; (hardcoded old royal blue)
+          -> FAILS TO UPDATE! The Pay button is stranded in blue!
+       ========================================================================== */
+
+    :root {
+      /* Palette updated at source to Emerald Green */
+      --primitive-primary-40: #059669;
+      --primitive-primary-90: #d1fae5;
+      --primitive-primary-30: #047857;
+      --primitive-primary-100: #ffffff;
+      --primitive-neutral-98: #f9f9ff;
+      --primitive-neutral-10: #161c25;
+      --primitive-neutral-variant-90: #dee2f1;
+      --primitive-neutral-variant-30: #424752;
+      --primitive-neutral-variant-94: #eef0ff;
+      --primitive-error-40: #ba1a1a;
+      --primitive-error-90: #ffdad5;
+      --primitive-error-30: #930009;
+
+      /* Roles correctly referencing palette */
+      --color-surface: var(--primitive-neutral-98);
+      --color-on-surface: var(--primitive-neutral-10);
+      --color-surface-container: #f0f3ff;
+      --color-surface-container-low: #f5f7ff;
+      --color-surface-container-lowest: #ffffff;
+      --color-on-surface-variant: var(--primitive-neutral-variant-30);
+      --color-outline: var(--primitive-neutral-variant-90);
+      --color-outline-variant: var(--primitive-neutral-variant-94);
+      --color-error-container: var(--primitive-error-90);
+      --color-on-error-container: var(--primitive-error-30);
+
+      /* THIS ROLE FOLLOWS THE PALETTE (New Emerald Green) */
+      --color-primary-container: var(--primitive-primary-90);
+      --color-on-primary-container: var(--primitive-primary-30);
+      --color-on-primary: var(--primitive-primary-100);
+
+      /* ========================================================================
+         REGRESSION DEFECT: This role was unlinked from var(--primitive-primary-40)
+         and hardcoded to raw hex #2563eb (old Royal Blue)!
+         ======================================================================== */
+      --color-primary: #2563eb;
+
+      --shadow-soft: 1px 4px 30px 0px rgba(5, 150, 105, 0.12);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 24px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .regression-warning-banner {
+      width: 100%;
+      max-width: 480px;
+      background-color: #fee2e2;
+      border: 1px solid #ef4444;
+      color: #991b1b;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-outline);
+    }
+
+    .school-title {
+      color: var(--color-on-surface-variant);
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .child-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-surface-container);
+      border: 1px solid var(--color-outline);
+      border-radius: 8px;
+      padding: 6px 12px;
+      color: var(--color-on-surface);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-banner {
+      background-color: var(--color-surface-container-low);
+      border-left: 3px solid var(--color-primary); /* Uses broken unlinked blue */
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+
+    .posted-date {
+      color: var(--color-on-surface);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .official-notice {
+      color: var(--color-on-surface-variant);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    /* Primary Balance Card - Correctly follows new Emerald Green palette */
+    .balance-card {
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+      padding: 24px 20px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid rgba(5, 150, 105, 0.2);
+    }
+
+    .balance-label {
+      color: var(--color-on-primary-container);
+      font-size: 16px;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    .balance-amount {
+      color: var(--color-on-primary-container);
+      font-size: 36px;
+      font-weight: 600;
+      line-height: 44px;
+      letter-spacing: -0.72px;
+    }
+
+    .pending-alert {
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      border: 1px solid var(--color-outline);
+    }
+
+    .breakdown-section {
+      background-color: var(--color-surface-container-lowest);
+      border: 1px solid var(--color-outline);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-header {
+      color: var(--color-on-surface);
+      font-size: 16px;
+      font-weight: 500;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-outline-variant);
+    }
+
+    .item-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .fee-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--color-outline-variant);
+    }
+
+    .fee-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-title {
+      color: var(--color-on-surface);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .item-due {
+      color: var(--color-on-surface-variant);
+      font-size: 12px;
+    }
+
+    .item-pricing {
+      text-align: right;
+    }
+
+    .item-amount {
+      color: var(--color-on-surface);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .badge-overdue {
+      background-color: var(--color-error-container);
+      color: var(--color-on-error-container);
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .actions-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    /* BROKEN BUTTON: Stuck on old Royal Blue (#2563EB) */
+    .btn-primary {
+      background-color: var(--color-primary); /* #2563eb (OLD BLUE) */
+      color: var(--color-on-primary);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--color-primary); /* #2563eb (OLD BLUE) */
+      border: 1px solid var(--color-outline);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .footer-help {
+      text-align: center;
+      color: var(--color-on-surface-variant);
+      font-size: 12px;
+      padding: 12px 0 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="regression-warning-banner">
+    <strong>STEP 8 REGRESSION EVIDENCE:</strong><br>
+    The brand primary palette was updated at the source to <strong>Emerald Green (<code>#059669</code>)</strong>.<br>
+    The balance card container correctly followed the new green palette (<code>--color-primary-container</code>), but the primary button is stuck on the old <strong>Royal Blue (<code>#2563EB</code>)</strong> because <code>--color-primary</code> was broken to a raw hex value instead of referencing <code>var(--primitive-primary-40)</code>.
+  </div>
+
+  <main class="app-container">
+    <header class="top-bar">
+      <span class="school-title">Crown Heights Academy</span>
+      <div class="child-switcher">
+        <span>Chidi Adebayo (JSS 2A)</span>
+        <span>▾</span>
+      </div>
+    </header>
+
+    <section class="status-banner">
+      <p class="posted-date">The bursar's book is posted up to 28 Oct 2026.</p>
+      <p class="official-notice">The bursar's book is the official record. If this looks wrong, tap Talk to a person.</p>
+    </section>
+
+    <!-- CONTAINER FOLLOWS NEW GREEN PALETTE -->
+    <section class="balance-card">
+      <span class="balance-label">Total Outstanding Balance</span>
+      <div class="balance-amount">₦145,000</div>
+      <div class="pending-alert">
+        A payment of ₦25,000 is waiting to be checked. Reference FLW-294810.
+      </div>
+    </section>
+
+    <section class="breakdown-section">
+      <h2 class="section-header">Fee Breakdown & Due Dates</h2>
+      <ul class="item-list">
+        <li class="fee-item">
+          <div class="item-info">
+            <span class="item-title">Term 1 Tuition Fee</span>
+            <span class="item-due">Due 15 Oct 2026</span>
+          </div>
+          <div class="item-pricing">
+            <span class="item-amount">₦95,000</span>
+            <span class="badge-overdue">Overdue</span>
+          </div>
+        </li>
+        <li class="fee-item">
+          <div class="item-info">
+            <span class="item-title">School Development Levy</span>
+            <span class="item-due">Due 10 Nov 2026</span>
+          </div>
+          <div class="item-pricing">
+            <span class="item-amount">₦30,000</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- BUTTON IS STUCK ON OLD BLUE DUE TO HARDCODED RAW HEX -->
+    <nav class="actions-group">
+      <button class="btn-primary" type="button">Pay School Fees (₦145,000)</button>
+      <button class="btn-secondary" type="button">Talk to a person</button>
+    </nav>
+
+    <footer class="footer-help">
+      Need an arrangement or scholarship credit? <a href="#" style="color: var(--color-primary);">Ask the school</a>
+    </footer>
+  </main>
+</body>
+</html>
