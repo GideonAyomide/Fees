@@ -1,0 +1,53 @@
+=== RECOVERY 1: NESTED FOLDER FIXED (BOTH WAYS) ===
+Captured: 2026-10-30T16:28:30+01:00
+
+FIX METHOD 1: CHANGING DIRECTORY (cd into nested folder)
+Command:
+cd fees
+npm run dev
+
+Terminal Output:
+> fees@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.1.0
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.196:3000
+
+ ✓ Ready in 2.1s
+(Analysis: Works as an immediate workaround, but breaks root CI/CD scripts, Dockerfiles, and top-level git tracking if the repo assumes package.json at root.)
+
+--------------------------------------------------------------------------------
+
+FIX METHOD 2: RESCAFFOLDING IN PLACE (Flattening to project root)
+Command:
+# Move all nested files to root workspace and remove nested directory
+Move-Item -Path .\fees\* -Destination .\ -Force
+Remove-Item -Path .\fees -Recurse -Force
+
+Verification Command (Run from root C:\Users\HP\Desktop\Fees):
+npm run build
+
+Terminal Output:
+> fees@0.1.0 build
+> next build
+
+   ▲ Next.js 15.1.0
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/4) ...
+ ✓ Generating static pages (4/4)
+   Finalizing page optimization ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    136 B           105 kB
+└ ○ /_not-found                          979 B           106 kB
++ First Load JS shared by all            105 kB
+
+○  (Static)  prerendered as static content
+
+(Conclusion: Rescaffolding in place restores root-level execution, aligning with standard repository structure and CI pipelines.)
+

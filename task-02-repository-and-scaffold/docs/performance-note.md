@@ -30,3 +30,4 @@ The massive difference between the development cold load and production targets 
 
 3. **Development Instrumentation vs. Production Optimization**:
    The dev server injects Hot Module Replacement (HMR) websockets, source maps, React devtools hooks, and un-minified code to facilitate debugging. In contrast, running `next build` pre-compiles all static routes ahead of time. In production (`next start`), the server performs zero runtime compilation: it reads pre-built static HTML (which is only 136 bytes for our home page) and streams it immediately in under 10 ms.
+

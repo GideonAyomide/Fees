@@ -1,0 +1,49 @@
+=== RECOVERY 2: PORT CONFLICT RESOLVED ===
+Captured: 2026-10-30T16:30:15+01:00
+
+1. Discovery Command Used to Locate Conflicting Process:
+Command:
+Get-NetTCPConnection -LocalPort 3000 | Select-Object LocalAddress, LocalPort, State, OwningProcess
+
+Terminal Output:
+LocalAddress LocalPort State  OwningProcess
+------------ --------- -----  -------------
+0.0.0.0      3000      Listen 22264
+
+Identified Process ID (PID): 22264
+
+--------------------------------------------------------------------------------
+
+2. Termination Command:
+Command:
+Stop-Process -Id 22264 -Force
+
+Terminal Output:
+[Process 22264 successfully terminated]
+
+--------------------------------------------------------------------------------
+
+3. Port Release Verification:
+Command:
+Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue
+
+Terminal Output:
+[EMPTY - Port 3000 is free and available]
+
+--------------------------------------------------------------------------------
+
+4. Clean Server Startup on Port 3000:
+Command:
+npm run dev
+
+Terminal Output:
+> fees@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.1.0
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.196:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.4s
+

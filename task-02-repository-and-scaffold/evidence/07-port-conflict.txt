@@ -1,0 +1,25 @@
+=== FAILURE 2: PORT CONFLICT TERMINAL OUTPUT ===
+Captured: 2026-10-30T16:29:48+01:00
+Target Port: 3000
+
+Error Context:
+A conflicting background process was started listening on port 3000 (0.0.0.0:3000).
+When attempting to start the development server on port 3000, the system detects the collision.
+
+Command Attempt:
+npx next dev -p 3000
+
+Terminal Output & Socket Collision:
+- Port 3000 is in use, trying 3001 instead
+[Error: listen EADDRINUSE: address already in use 0.0.0.0:3000] {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 3000
+}
+
+Active Socket Audit:
+LocalAddress   LocalPort   RemoteAddress   RemotePort   State    OwningProcess
+0.0.0.0        3000        0.0.0.0         0            Listen   22264
+

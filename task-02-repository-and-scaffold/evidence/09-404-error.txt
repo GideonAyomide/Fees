@@ -1,0 +1,20 @@
+=== FAILURE 3: 404 AND BLANK PAGE TERMINAL LOG ===
+Captured: 2026-10-30T16:35:10+01:00
+Requested URL: http://localhost:3000/dashboard
+
+Client Request Output:
+HTTP/1.1 404 Not Found
+Date: Fri, 30 Oct 2026 15:35:10 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Type: text/html; charset=utf-8
+Content-Length: 979
+
+Server Log Output:
+ GET /dashboard 404 in 18ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 410ms (182 modules)
+
+Observed Interface State:
+The browser displayed a bare default 404 state with a blank background and unstyled error text: "404 | This page could not be found."
+
