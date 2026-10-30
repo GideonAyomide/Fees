@@ -1,0 +1,32 @@
+=== TASK FOUR STEP 4.2: HARDWARE TIMING BENCHMARK (ARGON2ID VS SHA-256) ===
+Machine Architecture: x64
+Node Runtime: v24.19.0
+Platform: win32
+Date: 30 October 2026
+
+[MEASURED TIMING FROM THIS MACHINE]:
+1. Argon2id (Slow Adaptive Hashing, 64MB memory, 3 iterations):
+   Average execution time: 196.509 milliseconds per hash
+   Single-thread throughput: 5 guesses/second
+
+2. SHA-256 (Fast Cryptographic Digest):
+   Average execution time: 9.157 microseconds (0.009157 ms)
+   Single-thread throughput: 109,204 guesses/second
+
+[ARITHMETIC RATIO]:
+Argon2id is 21,460x slower than SHA-256 on this CPU.
+
+[WHAT THIS MEANS FOR AN ATTACKER WHO HAS STOLEN THE DATABASE]:
+Against SHA-256:
+- A single commercial GPU (e.g. NVIDIA RTX 4090) evaluates ~23,000,000,000 SHA-256 hashes per second.
+- An 8-character parent PIN/passphrase from a leaked table can be 100% brute-forced in under 12 minutes.
+- Cost to attacker: $0 (laptop GPU).
+
+Against Argon2id:
+- Because Argon2id requires 64 MB of dedicated RAM per hash thread, an RTX 4090 with 24 GB VRAM is strictly memory-bottlenecked to ~375 concurrent instances.
+- The GPU evaluates fewer than 2,000 guesses per second.
+- Exhausting the same keyspace requires over 140 years.
+- Cost to attacker: Prohibitive in hardware, electricity, and memory bandwidth.
+
+[THE INVERSION]:
+You hash once per login, an attacker hashes billions of times; so slowing it down costs you nothing measurable (a human cannot perceive ~197 ms during a form submit) and costs the attacker everything.

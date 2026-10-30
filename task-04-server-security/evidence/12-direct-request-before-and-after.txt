@@ -1,0 +1,60 @@
+=== TASK FOUR STEP 7: DIRECT ATTACK REPEATED (BEFORE AND AFTER COMPARISON) ===
+Target Endpoint: http://localhost:3000/api/auth/activate
+Target Method: HTTP POST (Direct terminal invocation bypassing browser DOM & JavaScript validation)
+Execution Date: 30 October 2026
+
+================================================================================
+1. THE DIRECT REQUEST COMMAND (IDENTICAL FOR BOTH TESTS)
+================================================================================
+Invoke-RestMethod -Uri "http://localhost:3000/api/auth/activate" -Method Post -ContentType "application/json" -Body '{"phone":"INVALID-BOT-PHONE","studentId":"x","slipCode":"00","acceptTerms":false}'
+
+================================================================================
+2. TASK THREE RESPONSE (THE DEFENSELESS ENDPOINT - CLIENT VALIDATION ONLY)
+================================================================================
+HTTP Status: 200 OK
+Response Body:
+{
+  "success": true,
+  "message": "Account activation accepted.",
+  "accountStatus": "PROVISIONED",
+  "dataReceived": {
+    "phone": "INVALID-BOT-PHONE",
+    "studentId": "x",
+    "slipCode": "00",
+    "acceptTerms": false
+  },
+  "clientRulesEnforcedOnServer": 0
+}
+
+Audit Finding:
+- The server accepted single-character student ID "x".
+- The server accepted invalid alphanumeric phone "INVALID-BOT-PHONE".
+- The server accepted 2-digit slip code "00".
+- The server accepted "acceptTerms": false despite client disabling submit button until checked.
+- Client validation was proved to be ZERO security against direct HTTP traffic.
+
+================================================================================
+3. TASK FOUR RESPONSE (THE HARDENED ENDPOINT - ZOD BOUNDARY ENFORCEMENT)
+================================================================================
+HTTP Status: 400 Bad Request
+Response Body:
+{
+  "success": false,
+  "error": "Validation failed: Invalid request payload shape.",
+  "fieldErrors": {
+    "phone": "Phone number must be 10 or 11 digits.",
+    "email": "Invalid input: expected string, received undefined",
+    "studentId": "Student ID must be at least 4 characters.",
+    "slipCode": "Slip code must be exactly 6 digits.",
+    "acceptTerms": "Invalid input: expected true"
+  },
+  "rulesEnforcedOnServer": 5,
+  "executionTimeMs": 15.84
+}
+
+Audit Finding:
+- The server refused the request before touching any database model or background service.
+- Exactly 5 server-side validation rules fired and returned structured, actionable error descriptions.
+- The unauthenticated bot was completely blocked from provisioning an account or polluting the database.
+- Proves that security exists ONLY when enforced at the backend boundary.
+

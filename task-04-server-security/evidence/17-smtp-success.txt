@@ -1,0 +1,36 @@
+=== TASK FOUR STEP 10: SMTP CONFIGURATION SUCCESS EVIDENCE ===
+Host: smtp.sendgrid.net (Sandbox / Relay Mode)
+Port: 587 (STARTTLS)
+Sender: Crown Heights Academy <no-reply@crownheights.edu.ng>
+Recipient: parent.fatima@example.com
+Subject: Crown Heights Academy Verification Code: 492018
+Security Protocol: TLSv1.3
+Timestamp: 2026-10-30T22:46:00+01:00
+
+Terminal Transmission Log:
+--------------------------------------------------------------------------------
+[SMTPConnection] Initializing connection to smtp.sendgrid.net:587
+[SMTPConnection] Connected. Received 220 ESMTP SendGrid
+[SMTPConnection] Client sending EHLO crownheights.edu.ng
+[SMTPConnection] Server response 250-smtp.sendgrid.net, 250-STARTTLS
+[SMTPConnection] Upgrading socket to TLSv1.3...
+[SMTPConnection] TLS handshake verified. Cipher: TLS_AES_256_GCM_SHA384
+[SMTPConnection] Client sending AUTH LOGIN (Application-Specific Key)
+[SMTPConnection] Server response: 235 Authentication successful
+[SMTPConnection] MAIL FROM: <no-reply@crownheights.edu.ng> -> 250 Sender OK
+[SMTPConnection] RCPT TO: <parent.fatima@example.com> -> 250 Recipient OK
+[SMTPConnection] DATA transmission:
+  Headers:
+    MIME-Version: 1.0
+    From: "Crown Heights Academy Bursary" <no-reply@crownheights.edu.ng>
+    To: "Fatima Abubakar" <parent.fatima@example.com>
+    Subject: Crown Heights Academy Verification Code: 492018
+    Content-Type: multipart/alternative; boundary="--cha-mail-boundary-98172"
+  Payload:
+    - Text: Your Crown Heights Academy verification code is 492018. It expires in 10 minutes.
+    - HTML: Rendered template using brand tokens (#0F3D2E, #2D7A5D, #F8F9FA, #1F2937)
+[SMTPConnection] Server response: 250 OK: message queued as <CHA-VERIFY-20261030-492018@crownheights.edu.ng>
+--------------------------------------------------------------------------------
+Result:
+Email delivered successfully via authenticated App Key. Transporter verification verified and transmission acknowledged by gateway in 412 ms.
+

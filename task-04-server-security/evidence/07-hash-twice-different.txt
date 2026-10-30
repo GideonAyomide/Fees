@@ -1,0 +1,15 @@
+=== TASK FOUR STEP 4.1: HASHING THE SAME PASSWORD TWICE ===
+Target Password: "CrownHeightsParent2026!"
+Algorithm: Argon2id (RFC 9106)
+Memory Cost: 65536 KB (64 MB)
+Time Cost (Iterations): 3
+Parallelism: 4 threads
+
+[RUN 1 OUTPUT]:
+$argon2id$v=19$m=65536,p=4,t=3$EvpoA0GeMmW9ypZXX61qzQ$N6iUtuHIdE3D0+PGKqFT5j2LKET60zwmPBxM6ODJsy8
+
+[RUN 2 OUTPUT]:
+$argon2id$v=19$m=65536,p=4,t=3$jv0EmYpe1kcbgtxzXOYF2w$9r5Co/a4aQOM8iKP//knYky4+TQeZQmOR6am/MTDwHo
+
+[ONE-LINE EXPLANATION OF WHY THEY DIFFER]:
+Argon2id automatically generates a unique cryptographically random 16-byte salt for every hashing operation, ensuring identical plaintext inputs produce entirely distinct digest outputs to defeat precomputed rainbow tables.

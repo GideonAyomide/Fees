@@ -1,0 +1,30 @@
+=== TASK FOUR STEP 10: SMTP CONFIGURATION FAILURE EVIDENCE ===
+Host: smtp.gmail.com
+Port: 587 (STARTTLS)
+Username: bursar.crownheights@gmail.com
+Auth Method: PLAIN / LOGIN
+Timestamp: 2026-10-30T22:45:15+01:00
+
+Terminal Output:
+--------------------------------------------------------------------------------
+--- ATTEMPT 1: Plain Account Password on smtp.gmail.com:587 ---
+[SMTPConnection] Connecting to smtp.gmail.com:587
+[SMTPConnection] Connection established. Sending EHLO...
+[SMTPConnection] Upgrading to STARTTLS...
+[SMTPConnection] TLS established. Sending AUTH LOGIN...
+
+CAPTURE ERROR CODE: EAUTH
+CAPTURE ERROR RESPONSE: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-4aa81a896fesm180675775e9.10 - gsmtp
+CAPTURE ERROR MESSAGE:
+Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-4aa81a896fesm180675775e9.10 - gsmtp
+--------------------------------------------------------------------------------
+
+Diagnosis:
+The SMTP configuration failed because an ordinary personal/account password was used instead of an Application-Specific Password. In May 2022, Google disabled "Less Secure Apps" (basic authentication with account passwords). Any automated server SMTP delivery through Google Mail requires two-factor authentication to be enabled and a dedicated 16-character App Password generated.
+
+The Fix:
+1. In production: Configure 2FA on the school's Google Workspace administrator account and generate a 16-character App Password stored strictly in the environment variable `SMTP_PASS`.
+2. In development/staging: Configure local decoupled mailer or dedicated transactional email API (e.g., Mailgun/Postmark/SendGrid or Nodemailer JSON/Ethereal transport) without blocking web server execution.
+

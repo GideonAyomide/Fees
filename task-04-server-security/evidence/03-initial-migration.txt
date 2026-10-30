@@ -1,0 +1,5 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-frosty-boat-b5bm9wby-pooler.c-7.us-east-2.aws.neon.tech"
+
+Error: P1017: Server has closed the connection.
