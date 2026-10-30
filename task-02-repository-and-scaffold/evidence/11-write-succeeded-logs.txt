@@ -24,3 +24,4 @@ Environment: Next.js 15.1.0 App Router with Neon PostgreSQL backend
 1. Status Code: HTTP 201 Created (Returned on POST /api/enquiry).
 2. Meaning: A 201 status code confirms that the resource was not merely received, but successfully created and persisted in the durable database with a server-assigned primary key (ID) and timestamp.
 3. Verification: Contrast with 200 OK (generic acknowledgement without guaranteed persistence) and 500 (captured in evidence/13 when database is disconnected).
+
