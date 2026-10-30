@@ -173,3 +173,4 @@ Open the database inspector (`npx prisma studio` or run `SELECT count(*) FROM "E
 **What I would do instead**: Inspect server request logs for `HTTP 201 Created`, query the database directly to verify row persistence, and deliberately break the database connection to confirm the application fails honestly.
 
 *(102 words)*
+

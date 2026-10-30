@@ -35,3 +35,4 @@ In accordance with Rule 8 of the assessment framework, this document records rea
   Breaks the single source of truth. If the school modifies its brand palette in Figma, components consuming the raw pass-through fail to update, creating visual divergence across the application.
 * **Remediation**:
   Add a strict regex check in `scripts/build-tokens.js` that throws a fatal compilation error whenever a primitive hex value is detected in a semantic tier variable definition.
+

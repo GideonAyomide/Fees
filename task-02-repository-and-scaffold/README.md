@@ -53,3 +53,4 @@ Task Two tests whether an engineer can direct an AI agent to scaffold an applica
 ### 5. Task Deliverables Inventory
 * **Documentation**: `scaffold-prompt.md`, `model-choices.md`, `performance-note.md`, `false-success.md`, `readme-test.md`, `working-tree.md`, `information-design.md`, `defects.md`, `interview-answers.md`.
 * **Evidence Files**: `01` through `15` present in `evidence/`. Screenshots `16` through `20` ready for browser capture via `screens/`.
+

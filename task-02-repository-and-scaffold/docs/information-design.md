@@ -90,3 +90,4 @@ font-size: clamp(1.75rem, 5vw + 0.5rem, 2.375rem);
 * **At 360px (Small Mobile)**: Renders at `1.75rem` (28px), ensuring the 2-line heading fits comfortably without horizontal scrolling.
 * **At 768px (Tablet)**: Scales fluidly to `2.125rem` (34px).
 * **At 1200px+ (Desktop)**: Caps cleanly at `2.375rem` (38px).
+
