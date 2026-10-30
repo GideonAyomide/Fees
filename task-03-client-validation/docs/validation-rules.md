@@ -24,11 +24,13 @@ Every validation rule in Crown Heights Academy Fees has been derived directly fr
 
 ### Category 3: Format in Real Time (Registration vs. Login Asymmetry)
 * **On Registration / Activation (`/auth?mode=activate`)**:
-  Enforced **in real time**. As the parent types, non-numeric characters are immediately stripped, and character count warnings update dynamically.
-  * *Why*: Registration establishes durable identity. High friction and instant visual guidance prevent invalid data from ever being drafted.
+  Enforced **in real time**. As the parent types, email format (`^[^\s@]+@[^\s@]+\.[^\s@]+$`) is validated on every keystroke, offering instant visual confirmation (`✓ Valid email format`) or immediate caution guidance (`⚠️ Please enter a valid email address`).
+  * *Why*: Registration establishes durable account identity. Friction here is constructive, ensuring bad contact records are never committed.
 * **On Login (`/auth?mode=login`)**:
   Enforced **on submit only**.
-  * *Why*: Aggressively throwing error banners at a returning parent while they are halfway through typing their phone number causes extreme annoyance and visual distraction.
+  * *Why*: Aggressively throwing error banners at a returning parent while they are halfway through typing `parent@...` causes extreme irritation and distraction. The input is evaluated when the user indicates completion by clicking the submit button.
+* **Why Checking Email Existence in the Browser Is Pointless**:
+  Checking whether an email address actually exists on the remote mail server during form input is pointless because SMTP VRFY/RCPT probes are deliberately blocked or falsified by modern mail providers to prevent address harvesting. Furthermore, syntactically proving a mailbox exists provides zero evidence that the person currently typing at the keyboard owns it or has access to its inbox; genuine ownership can only be established asynchronously by dispatching a cryptographic verification token.
 
 ### Category 4: Accessible ARIA Labels & Error Association
 * Every invalid field sets `aria-invalid="true"`.
@@ -62,4 +64,10 @@ Every validation rule in Crown Heights Academy Fees has been derived directly fr
 * **What Breaks Without It**: Non-compliance with the Nigeria Data Protection Act (NDPA), exposing the school to regulatory fines for displaying child ledger data without guardian consent.
 * **Who It Wrongly Blocks**: Parents with visual or motor impairments navigating on small touchscreens where clicking an un-enlarged checkbox target is difficult.
 * **Designing Around the Cost**: We enlarged the touch target to `44x44px`, wrapped the entire explanatory text in an accessible `<label>` element so tapping anywhere on the text toggles the checkbox, and made the disabled button explain the exact requirement when clicked.
+
+### Rule 5: Standard Email Format (`string@domain.tld`)
+* **What the Rule Is**: Requires standard email address shape with `@` and valid dot-separated top-level domain.
+* **What Breaks Without It**: Automated fee receipts, electronic payment invoices, and self-service PIN recovery links fail to deliver or bounce back, resulting in silent drop-offs and lost parent communication.
+* **Who It Wrongly Blocks**: Users with unusual but RFC-compliant email formats (such as unquoted spaces or uncommon internationalized domain names) or non-technical parents who type commas instead of periods (`.com` typed as `,com`).
+* **Designing Around the Cost**: We deliberately chose a clean boundary pattern (`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`) rather than an over-engineered regex, permitting valid plus-aliased mailboxes (`parent+fees@domain.com`) while preventing garbage input from corrupting notification queues.
 
