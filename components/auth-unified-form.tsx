@@ -8,6 +8,7 @@ type AuthMode = 'login' | 'activate' | 'reset';
 
 interface FormErrors {
   phone?: string;
+  email?: string;
   pin?: string;
   studentId?: string;
   slipCode?: string;
@@ -24,6 +25,7 @@ export function AuthUnifiedForm() {
 
   // Form Fields
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [pin, setPin] = useState('');
   const [studentId, setStudentId] = useState('');
   const [slipCode, setSlipCode] = useState('');
@@ -66,6 +68,15 @@ export function AuthUnifiedForm() {
         if (trimmed.length < 10 || trimmed.length > 11) return 'Phone number must be 10 or 11 digits.';
       }
 
+      if (name === 'email') {
+        if (!trimmed) return 'Email address cannot be left blank.';
+        // The valid shape is a string, then an at character, then a domain (Category 3)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmed)) {
+          return 'Please enter a valid email address (e.g. parent@example.com).';
+        }
+      }
+
       if (name === 'pin') {
         if (!trimmed) return 'Security PIN cannot be left blank.';
         if (!/^\d+$/.test(trimmed)) return 'PIN must contain digits only.';
@@ -102,6 +113,28 @@ export function AuthUnifiedForm() {
     setDisabledButtonClickReason(null);
   };
 
+  // Category 3: Asymmetric email format validation
+  // Real-time on registration (activate); on-submit on login to avoid premature nagging
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEmail(val);
+    setDisabledButtonClickReason(null);
+
+    if (mode === 'activate') {
+      if (val.length > 0) {
+        setErrors((prev) => ({ ...prev, email: validateField('email', val) }));
+      } else if (touched.email) {
+        setErrors((prev) => ({ ...prev, email: 'Email address cannot be left blank.' }));
+      } else {
+        setErrors((prev) => ({ ...prev, email: undefined }));
+      }
+    } else {
+      if (errors.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())) {
+        setErrors((prev) => ({ ...prev, email: undefined }));
+      }
+    }
+  };
+
   const handlePinChange = (e: ChangeEvent<HTMLInputElement>) => {
     const cleaned = e.target.value.replace(/\D/g, '').slice(0, 4);
     setPin(cleaned);
@@ -128,18 +161,32 @@ export function AuthUnifiedForm() {
   };
 
   // Determine if form is completely valid
-  const isLoginFormValid = Boolean(phone.length >= 10 && pin.length === 4 && !errors.phone && !errors.pin);
+  const isLoginFormValid = Boolean(
+    phone.length >= 10 &&
+    email.trim().length > 0 &&
+    pin.length === 4 &&
+    !errors.phone &&
+    !errors.email &&
+    !errors.pin
+  );
   const isActivateFormValid = Boolean(
     phone.length >= 10 &&
+    email.trim().length > 0 &&
     studentId.trim().length >= 4 &&
     slipCode.length === 6 &&
     acceptTerms &&
     !errors.phone &&
+    !errors.email &&
     !errors.studentId &&
     !errors.slipCode &&
     !errors.terms
   );
-  const isResetFormValid = Boolean(phone.length >= 10 && !errors.phone);
+  const isResetFormValid = Boolean(
+    phone.length >= 10 &&
+    email.trim().length > 0 &&
+    !errors.phone &&
+    !errors.email
+  );
 
   const isFormValid =
     mode === 'login' ? isLoginFormValid : mode === 'activate' ? isActivateFormValid : isResetFormValid;
@@ -149,6 +196,7 @@ export function AuthUnifiedForm() {
     // 1. Mark all fields as touched
     setTouched({
       phone: true,
+      email: true,
       pin: true,
       studentId: true,
       slipCode: true,
@@ -159,6 +207,9 @@ export function AuthUnifiedForm() {
     const newErrors: FormErrors = {};
     const phoneErr = validateField('phone', phone);
     if (phoneErr) newErrors.phone = phoneErr;
+
+    const emailErr = validateField('email', email);
+    if (emailErr) newErrors.email = emailErr;
 
     if (mode === 'login') {
       const pinErr = validateField('pin', pin);
@@ -181,6 +232,8 @@ export function AuthUnifiedForm() {
       setDisabledButtonClickReason('Please review and accept the Terms & Conditions before activating.');
     } else if (phoneErr) {
       setDisabledButtonClickReason(phoneErr);
+    } else if (emailErr) {
+      setDisabledButtonClickReason(emailErr);
     } else if (mode === 'login' && newErrors.pin) {
       setDisabledButtonClickReason(newErrors.pin);
     } else if (mode === 'activate' && newErrors.slipCode) {
@@ -425,6 +478,46 @@ export function AuthUnifiedForm() {
             {errors.phone && (
               <span id="phone-error" role="alert" style={{ fontSize: '0.75rem', color: 'var(--color-error)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 ⚠️ {errors.phone}
+              </span>
+            )}
+          </div>
+
+          {/* Field: Guardian Email (Category 3: Real-time on activate, on-submit on login) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+            <label htmlFor="email" className="text-label-medium">
+              Guardian Email Address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              aria-required="true"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? 'email-error' : (mode === 'activate' && email.length > 0 && !errors.email ? 'email-success' : undefined)}
+              placeholder="e.g. parent@example.com"
+              value={email}
+              onChange={handleEmailChange}
+              onBlur={(e) => handleBlur('email', e.target.value)}
+              style={{
+                padding: '0.625rem 0.75rem',
+                borderRadius: '0.375rem',
+                border: `1px solid ${errors.email ? 'var(--color-error)' : 'var(--color-outline)'}`,
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-on-surface)',
+                fontSize: '0.875rem',
+                outline: 'none',
+              }}
+            />
+            {mode === 'activate' && email.length > 0 && !errors.email && (
+              <span id="email-success" style={{ fontSize: '0.75rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                ✓ Valid email format
+              </span>
+            )}
+            {errors.email && (
+              <span id="email-error" role="alert" style={{ fontSize: '0.75rem', color: 'var(--color-error)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                ⚠️ {errors.email}
               </span>
             )}
           </div>
