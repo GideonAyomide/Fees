@@ -1,0 +1,62 @@
+=== TASK TWO STEP 6: INVERSE TEST (CONNECTION FAILURE LOGS) ===
+Captured: 2026-10-30T19:29:48+01:00
+Test Condition: Environment variable DATABASE_URL missing / unconfigured
+
+--- TERMINAL SERVER LOG OUTPUT ---
+prisma:error 
+Invalid `prisma.enquiry.create()` invocation:
+
+
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   |
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   |
+
+Validation Error Count: 1
+[API /api/enquiry POST error]: 
+Invalid `prisma.enquiry.create()` invocation:
+
+
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   |
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   |
+
+Validation Error Count: 1
+ POST /api/enquiry 500 in 2172ms
+
+--- SUBSEQUENT RETRY REQUEST LOG ---
+prisma:error 
+Invalid `prisma.enquiry.create()` invocation:
+
+
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   |
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   |
+
+Validation Error Count: 1
+[API /api/enquiry POST error]: 
+Invalid `prisma.enquiry.create()` invocation:
+
+
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   |
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   |
+
+Validation Error Count: 1
+ POST /api/enquiry 500 in 144ms
+
+--- ANALYSIS ---
+1. Status Code: HTTP 500 Internal Server Error (Not 200 OK, Not 201 Created).
+2. Diagnostic Verification: The application refused to fake a successful submission.
+3. Security Compliance: The client received an honest, friendly apology message ("The school records service is currently unavailable") without exposing stack traces, credentials, or internal schema paths.
