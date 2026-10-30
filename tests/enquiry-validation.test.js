@@ -126,3 +126,4 @@ console.log('--- RUNNING ENQUIRY VALIDATION SUITE ---');
 }
 
 console.log('All 5 enquiry validation tests passed successfully.');
+

@@ -49,3 +49,4 @@ Before the first deployment, the cost of broken software is virtually zero. No p
 1. **Real Humans Depend on Uptime**: Crown Heights Academy parents open the web app to pay fees or verify balances before taking their children to school. A broken `main` immediately locks parents out or displays alarming errors.
 2. **Financial and Legal Liability**: In production, financial transactions pass through Flutterwave and writes hit Neon PostgreSQL. A faulty commit deployed to production can corrupt ledger rows, duplicate payment attempts, or leak cross-family balances.
 3. **Emergency Fixes Are Inevitable**: In production, critical fixes (hotfixes) must be shipped within minutes. With a branching model (`main` protected, changes developed on short-lived branches like `fix/fee-rounding`), a hotfix can be branched from `main`, tested, reviewed, and fast-forward merged in five minutes without dragging along weeks of experimental code.
+

@@ -52,3 +52,4 @@ export function validateEnquiryInput(body: EnquiryInput): ValidationResult {
     },
   };
 }
+

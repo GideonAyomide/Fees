@@ -76,3 +76,4 @@ The ultimate proof that an application genuinely relies on a database is to deli
 - Attempt to submit the form again.
 - **Expected Result**: The API must fail, catch the connection error, refuse to show a success message, and return **`HTTP 500 Internal Server Error`** with an honest institutional apology message.
 - If the form still claims "Success" when the database is offline, the system is fraudulent.
+
