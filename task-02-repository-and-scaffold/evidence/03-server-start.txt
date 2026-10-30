@@ -1,0 +1,13 @@
+=== DEVELOPMENT SERVER START TERMINAL OUTPUT ===
+Captured: 2026-10-30T16:15:45+01:00
+Command: npm run dev (next dev)
+
+> fees@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.1.0
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.196:3000
+
+ ✓ Starting...
+ ✓ Ready in 28.6s

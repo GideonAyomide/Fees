@@ -1,0 +1,17 @@
+=== FIRST PAGE LOAD LOG OUTPUT & TIMING ===
+Captured: 2026-10-30T16:18:28+01:00
+Target URL: http://localhost:3000/
+
+Server Log Output:
+ ○ Compiling / ...
+ ✓ Compiled / in 58.1s (575 modules)
+ GET / 200 in 68103ms
+
+HTTP Client Request Measurement:
+StatusCode:           200 (OK)
+ElapsedMilliseconds:  72217 ms (72.2 seconds total client turnaround)
+ContentLength:        32184 bytes
+
+Subsequent Reload Measurement (Warm Cache):
+Reload StatusCode:          200 (OK)
+Reload ElapsedMilliseconds: 2751 ms (2.75 seconds)
