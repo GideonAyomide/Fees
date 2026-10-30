@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function HomePage() {
   return (
     <main
@@ -97,6 +99,22 @@ export default function HomePage() {
           >
             Activate Account with Slip Code
           </button>
+
+          <Link
+            href="/enquiry"
+            className="text-label-large"
+            style={{
+              width: '100%',
+              padding: '12px 20px',
+              color: 'var(--color-primary)',
+              textDecoration: 'none',
+              borderRadius: '12px',
+              textAlign: 'center',
+              display: 'block',
+            }}
+          >
+            Have a question? Ask the School →
+          </Link>
         </div>
 
         {/* Bursar Official Record Notice */}
