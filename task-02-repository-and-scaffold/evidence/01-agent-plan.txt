@@ -1,0 +1,38 @@
+=== AGENT SCAFFOLDING PLAN & STATED ASSUMPTIONS ===
+Generated: 2026-10-30T15:28:40+01:00
+Target Project: Fees (Crown Heights Academy)
+Task: Task Two — Step 2
+
+1. ARCHITECTURAL UNDERSTANDING:
+- Business & Domain: "Fees" is a secure, retrieval-only web application for Crown Heights Academy parents in Lagos, Nigeria. It delivers private tuition balances and receipts directly from the school's ledger and answers fee questions strictly from approved records.
+- User Constraints: Parents use low-cost Android phones over intermittent mobile networks (small data bundles) under bright sunlight. The interface must be text-first, lightweight (under 20 KB response, under 1 MB app shell), fast-loading, and completely free of decorative clutter or heavy client dependencies.
+- Tech Stack (Non-Negotiable from AGENTS.md & PRD): Next.js with TypeScript using App Router. Server-rendered text pages. Pure CSS custom properties from design-tokens/tokens.css. No heavy client-side UI libraries (no Tailwind, no MUI, no Chakra).
+- Styling & Two-Tier Design Tokens: All visual styles must consume CSS variables from `styles/tokens.css`. Color roles (`--color-*`) are the only public UI contract. Primitive colors (`--primitive-*`) must never be used directly in components.
+
+2. STEP-BY-STEP SCAFFOLDING PLAN:
+- Step 1: Core Configuration Files
+  * Create `package.json` with pinned, approved dependencies: `next`, `react`, `react-dom`, `typescript`, and type definitions. No extra packages.
+  * Create `tsconfig.json` configured for Next.js App Router and strict TypeScript checking.
+  * Create `next.config.ts` with minimal standard configuration.
+- Step 2: Global Styles & Token Integration
+  * Create `app/globals.css` that imports `../styles/tokens.css`, enforces a box-sizing reset, and anchors body background and text to `--color-surface` and `--color-on-surface`.
+- Step 3: Root Application Layout
+  * Create `app/layout.tsx` providing standard HTML5 document structure, mobile viewport configuration, page title, and meta tags.
+- Step 4: Minimal 100vh Home Screen Shell
+  * Create `app/page.tsx` rendering a minimal, responsive 100vh landing shell:
+    - Crown Heights Academy header
+    - Clear, plain English purpose statement
+    - Initial entry point buttons (Sign In / Activate Slip) styled with `--color-primary` and `--color-outline`
+    - Full viewport height (`min-height: 100vh`), centered container, text-only (no images)
+- Step 5: Scope Boundary Check
+  * Strictly stop at the foundation. Do NOT generate database models, Prisma schemas, API route handlers, authentication logic, or payment checkout forms.
+
+3. STATED INITIAL ASSUMPTIONS:
+1. Framework Choice: Next.js with App Router and TypeScript is the mandated framework per AGENTS.md.
+2. Zero Extraneous Packages: The application runs with standard Next.js and React dependencies; no styling or state libraries are required.
+3. Styling Source of Truth: All styling will link to the existing `styles/tokens.css` compiled in Task One.
+4. Database & Auth Omission: Database connections (Prisma/Neon), session cookies, and API endpoints belong to Tasks 3, 4, and 5, and will not be scaffolded in this step.
+5. Home Screen Scope: The home screen is a minimal 100vh shell providing brand presence and portal orientation, not the finished authenticated product.
+
+STATUS: STOPPED. Awaiting user review and approval before creating any project files.
+

@@ -1,0 +1,25 @@
+=== FILES CREATED & ASSUMPTIONS INVENTORY ===
+Generated: 2026-10-30T15:40:40+01:00
+Target Project: Fees (Crown Heights Academy)
+Task: Task Two — Step 2
+
+1. FILES CREATED:
+- package.json
+  Purpose: Defines project metadata, scripts (dev, build, start, lint, build:tokens, test:tokens), and pinned dependencies (next 15.1.0, react 19.0.0, react-dom 19.0.0, typescript 5.7.0). Zero unapproved client libraries added.
+- tsconfig.json
+  Purpose: TypeScript configuration with strict mode enabled, path aliases (@/*), and Next.js App Router plugins.
+- next.config.ts
+  Purpose: Next.js runtime configuration setting reactStrictMode and disabling poweredByHeader.
+- app/globals.css
+  Purpose: Global stylesheet importing styles/tokens.css, establishing standard box-sizing reset, and binding root surface and text variables.
+- app/layout.tsx
+  Purpose: Root HTML layout providing document structure (<html lang="en">), mobile viewport settings, and metadata.
+- app/page.tsx
+  Purpose: Minimal, responsive 100vh home screen shell styled strictly with semantic design tokens (--color-primary, --color-surface, --color-on-surface, etc.) and type scale classes (.text-headline-large, .text-body-large, .text-label-large).
+
+2. ASSUMPTIONS MADE DURING EXECUTION:
+1. Framework & Router: Assumed Next.js 15 with App Router and TypeScript as the standard implementation of the PRD technical architecture.
+2. Styling Contract: Assumed styles/tokens.css is the single source of truth for all styling, using only semantic roles (--color-*) on UI components with zero raw hex codes.
+3. Scope Boundary: Assumed the home screen should serve as a minimal, non-functional 100vh orientation shell without premature forms, API endpoints, or database tables.
+4. Dependency Discipline: Assumed no additional CSS frameworks (Tailwind, Sass) or component libraries are permitted, adhering strictly to AGENTS.md.
+
