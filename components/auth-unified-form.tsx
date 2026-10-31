@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, FormEvent, ChangeEvent, FocusEvent } from 'react';
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-type AuthMode = 'login' | 'activate' | 'reset';
+type AuthMode = 'activate' | 'login' | 'reset';
 
 interface FormErrors {
   phone?: string;
@@ -19,8 +19,9 @@ export function AuthUnifiedForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Read initial mode from URL search param ?mode=... (default to 'login')
-  const initialMode = (searchParams.get('mode') as AuthMode) || 'login';
+  // Activate is the default authentication entry point
+  const urlParam = searchParams.get('mode') as AuthMode;
+  const initialMode: AuthMode = urlParam === 'login' || urlParam === 'reset' ? urlParam : 'activate';
   const [mode, setMode] = useState<AuthMode>(initialMode);
 
   // Form Fields
@@ -36,12 +37,15 @@ export function AuthUnifiedForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [statusMessage, setStatusMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [disabledButtonClickReason, setDisabledButtonClickReason] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Keep internal state synced when URL changes
   useEffect(() => {
     const urlMode = searchParams.get('mode') as AuthMode;
-    if (urlMode && (urlMode === 'login' || urlMode === 'activate' || urlMode === 'reset')) {
+    if (urlMode === 'login' || urlMode === 'reset' || urlMode === 'activate') {
       setMode(urlMode);
+    } else {
+      setMode('activate');
     }
   }, [searchParams]);
 
@@ -61,11 +65,34 @@ export function AuthUnifiedForm() {
     if (typeof value === 'string') {
       const trimmed = value.trim();
 
-      if (name === 'phone') {
-        if (!trimmed) return 'Phone number cannot be left blank.';
-        // Digits only check (text input with numeric enforcement)
-        if (!/^\d+$/.test(trimmed)) return 'Phone number must contain numbers only.';
-        if (trimmed.length < 10 || trimmed.length > 11) return 'Phone number must be 10 or 11 digits.';
+      if (name === 'phone' && mode !== 'reset') {
+        if (!trimmed) {
+          return mode === 'login'
+            ? 'Phone number or email address cannot be left blank.'
+            : 'Phone number cannot be left blank.';
+        }
+
+        if (mode === 'login') {
+          if (trimmed.includes('@')) {
+            // Category 3: Email format rule
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(trimmed)) {
+              return 'Please enter a valid email address (e.g. parent@example.com).';
+            }
+          } else {
+            // Category 2: Phone number digit & length checks
+            if (!/^\d+$/.test(trimmed)) {
+              return 'Must be a valid 10-11 digit phone number or email address.';
+            }
+            if (trimmed.length < 10 || trimmed.length > 11) {
+              return 'Phone number must be 10 or 11 digits.';
+            }
+          }
+        } else {
+          // Digits only check for account activation (text input with numeric enforcement)
+          if (!/^\d+$/.test(trimmed)) return 'Phone number must contain numbers only.';
+          if (trimmed.length < 10 || trimmed.length > 11) return 'Phone number must be 10 or 11 digits.';
+        }
       }
 
       if (name === 'email') {
@@ -104,23 +131,32 @@ export function AuthUnifiedForm() {
 
   // Real-time validation on change for Activation/Registration (Category 3 rule)
   const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // Restrict input to digits only (Step 4: text input instead of number input)
-    const cleaned = e.target.value.replace(/\D/g, '').slice(0, 11);
-    setPhone(cleaned);
-    if (mode === 'activate' && touched.phone) {
-      setErrors((prev) => ({ ...prev, phone: validateField('phone', cleaned) }));
+    const raw = e.target.value;
+    if (mode === 'activate') {
+      // Restrict input to digits only (Step 4: text input instead of number input)
+      const cleaned = raw.replace(/\D/g, '').slice(0, 11);
+      setPhone(cleaned);
+      if (touched.phone) {
+        setErrors((prev) => ({ ...prev, phone: validateField('phone', cleaned) }));
+      }
+    } else {
+      // Sign In mode: accepts phone or email, do not strip non-digits
+      setPhone(raw);
+      if (touched.phone) {
+        setErrors((prev) => ({ ...prev, phone: validateField('phone', raw) }));
+      }
     }
     setDisabledButtonClickReason(null);
   };
 
   // Category 3: Asymmetric email format validation
-  // Real-time on registration (activate); on-submit on login to avoid premature nagging
+  // Real-time on registration (activate) and reset; on-submit on login to avoid premature nagging
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setEmail(val);
     setDisabledButtonClickReason(null);
 
-    if (mode === 'activate') {
+    if (mode === 'activate' || mode === 'reset') {
       if (val.length > 0) {
         setErrors((prev) => ({ ...prev, email: validateField('email', val) }));
       } else if (touched.email) {
@@ -160,9 +196,19 @@ export function AuthUnifiedForm() {
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
+  // Helper to validate login identifier (phone or email)
+  const isLoginIdentifierValid = (val: string): boolean => {
+    const trimmed = val.trim();
+    if (!trimmed) return false;
+    if (trimmed.includes('@')) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+    }
+    return /^\d{10,11}$/.test(trimmed);
+  };
+
   // Determine if form is completely valid
   const isLoginFormValid = Boolean(
-    phone.length >= 10 &&
+    isLoginIdentifierValid(phone) &&
     pin.length === 4 &&
     !errors.phone &&
     !errors.pin
@@ -172,18 +218,20 @@ export function AuthUnifiedForm() {
     email.trim().length > 0 &&
     studentId.trim().length >= 4 &&
     slipCode.length === 6 &&
+    pin.length === 4 &&
     acceptTerms &&
     !errors.phone &&
     !errors.email &&
     !errors.studentId &&
     !errors.slipCode &&
+    !errors.pin &&
     !errors.terms
   );
+  // Reset PIN requires only valid email (no phone field)
   const isResetFormValid = Boolean(
-    phone.length >= 10 &&
     email.trim().length > 0 &&
-    !errors.phone &&
-    !errors.email
+    !errors.email &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   );
 
   const isFormValid =
@@ -203,24 +251,28 @@ export function AuthUnifiedForm() {
         email: true,
         studentId: true,
         slipCode: true,
+        pin: true,
         terms: true,
       });
-    } else {
+    } else if (mode === 'reset') {
       setTouched({
-        phone: true,
         email: true,
       });
     }
 
     // 2. Validate every relevant field for the current active mode
     const newErrors: FormErrors = {};
-    const phoneErr = validateField('phone', phone);
-    if (phoneErr) newErrors.phone = phoneErr;
+    if (mode !== 'reset') {
+      const phoneErr = validateField('phone', phone);
+      if (phoneErr) newErrors.phone = phoneErr;
+    }
 
-    if (mode === 'login') {
+    if (mode === 'login' || mode === 'activate') {
       const pinErr = validateField('pin', pin);
       if (pinErr) newErrors.pin = pinErr;
-    } else if (mode === 'activate') {
+    }
+
+    if (mode === 'activate') {
       const emailErr = validateField('email', email);
       if (emailErr) newErrors.email = emailErr;
 
@@ -240,38 +292,127 @@ export function AuthUnifiedForm() {
     setErrors(newErrors);
 
     // 3. Set top-level explanatory alert banner
-    if (mode === 'activate' && !acceptTerms) {
+    if (mode === 'reset') {
+      if (newErrors.email) {
+        setDisabledButtonClickReason(newErrors.email);
+      } else {
+        setDisabledButtonClickReason('Please enter a valid email address to request a reset link.');
+      }
+    } else if (mode === 'activate' && !acceptTerms) {
       setDisabledButtonClickReason('Please review and accept the Terms & Conditions before activating.');
-    } else if (phoneErr) {
-      setDisabledButtonClickReason(phoneErr);
+    } else if (newErrors.phone) {
+      setDisabledButtonClickReason(newErrors.phone);
     } else if (mode === 'login' && newErrors.pin) {
       setDisabledButtonClickReason(newErrors.pin);
     } else if (mode === 'activate' && newErrors.email) {
       setDisabledButtonClickReason(newErrors.email);
-    } else if (mode === 'activate' && newErrors.slipCode) {
-      setDisabledButtonClickReason(newErrors.slipCode);
     } else if (mode === 'activate' && newErrors.studentId) {
       setDisabledButtonClickReason(newErrors.studentId);
-    } else if (mode === 'reset' && newErrors.email) {
-      setDisabledButtonClickReason(newErrors.email);
+    } else if (mode === 'activate' && newErrors.slipCode) {
+      setDisabledButtonClickReason(newErrors.slipCode);
+    } else if (mode === 'activate' && newErrors.pin) {
+      setDisabledButtonClickReason(newErrors.pin);
     } else {
       setDisabledButtonClickReason('Please complete all required fields correctly to proceed.');
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!isFormValid) {
+    if (!isFormValid || isSubmitting) {
       triggerValidationAndExplain();
       return;
     }
 
+    setIsSubmitting(true);
+    setStatusMessage(null);
+    setDisabledButtonClickReason(null);
+
     if (mode === 'login') {
-      setStatusMessage({ text: 'Verifying credentials with school records...', type: 'success' });
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, pin }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setStatusMessage({
+            text: data.error || 'Incorrect phone number, email address, or security PIN.',
+            type: 'error',
+          });
+        } else {
+          setStatusMessage({
+            text: 'Sign in successful! Entering guardian portal...',
+            type: 'success',
+          });
+          router.push('/dashboard');
+        }
+      } catch {
+        setStatusMessage({
+          text: 'Network error connecting to school authentication server. Please check your connection.',
+          type: 'error',
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     } else if (mode === 'activate') {
-      setStatusMessage({ text: 'Account activated successfully! You may now sign in with your PIN.', type: 'success' });
+      try {
+        const res = await fetch('/api/auth/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, email, studentId, slipCode, pin, acceptTerms }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setStatusMessage({
+            text: data.error || 'Account activation failed. Please verify your details.',
+            type: 'error',
+          });
+        } else {
+          setStatusMessage({
+            text: 'Account activated successfully! You may now sign in with your phone or email and PIN.',
+            type: 'success',
+          });
+          setTimeout(() => {
+            handleModeSwitch('login');
+          }, 1500);
+        }
+      } catch {
+        setStatusMessage({
+          text: 'Network error communicating with the school server.',
+          type: 'error',
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
-      setStatusMessage({ text: 'A verification code has been dispatched to your registered phone.', type: 'success' });
+      try {
+        const res = await fetch('/api/auth/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setStatusMessage({
+            text: data.error || 'Failed to request PIN reset.',
+            type: 'error',
+          });
+        } else {
+          setStatusMessage({
+            text: 'A PIN reset link has been dispatched to your registered email address.',
+            type: 'success',
+          });
+        }
+      } catch {
+        setStatusMessage({
+          text: 'Network error communicating with the school server.',
+          type: 'error',
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -283,7 +424,7 @@ export function AuthUnifiedForm() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '2rem 1rem',
+        padding: '2.5rem 1rem',
         backgroundColor: 'var(--color-surface)',
         color: 'var(--color-on-surface)',
       }}
@@ -298,22 +439,92 @@ export function AuthUnifiedForm() {
         }}
       >
         {/* Navigation & Institutional Header */}
-        <header style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Link
-            href="/"
-            className="text-label-medium"
+        <header style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <nav
+            aria-label="Authentication navigation"
             style={{
-              color: 'var(--color-primary)',
-              textDecoration: 'none',
-              alignSelf: 'flex-start',
-              cursor: 'pointer',
-              display: 'inline-flex',
+              display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              gap: '0.25rem',
+              width: '100%',
             }}
           >
-            ← Back to Home
-          </Link>
+            <Link
+              href="/"
+              className="text-label-medium"
+              style={{
+                color: 'var(--color-primary)',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+              }}
+            >
+              ← Back to Home
+            </Link>
+
+            {mode === 'activate' && (
+              <button
+                type="button"
+                onClick={() => handleModeSwitch('login')}
+                className="text-label-medium"
+                style={{
+                  color: 'var(--color-primary)',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--color-outline-variant)',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  boxShadow: 'var(--shadow-soft)',
+                }}
+              >
+                Sign In
+              </button>
+            )}
+
+            {mode === 'login' && (
+              <button
+                type="button"
+                onClick={() => handleModeSwitch('activate')}
+                className="text-label-medium"
+                style={{
+                  color: 'var(--color-primary)',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--color-outline-variant)',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  boxShadow: 'var(--shadow-soft)',
+                }}
+              >
+                Activate Account
+              </button>
+            )}
+
+            {mode === 'reset' && (
+              <button
+                type="button"
+                onClick={() => handleModeSwitch('login')}
+                className="text-label-medium"
+                style={{
+                  color: 'var(--color-primary)',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid var(--color-outline-variant)',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  boxShadow: 'var(--shadow-soft)',
+                }}
+              >
+                Sign In
+              </button>
+            )}
+          </nav>
+
           <span
             className="text-label-medium"
             style={{
@@ -325,88 +536,16 @@ export function AuthUnifiedForm() {
             Crown Heights Academy
           </span>
           <h1 className="text-headline-medium" style={{ margin: 0 }}>
-            {mode === 'login' && 'Parent Sign In'}
             {mode === 'activate' && 'Activate Account'}
+            {mode === 'login' && 'Parent Sign In'}
             {mode === 'reset' && 'Reset Security PIN'}
           </h1>
           <p className="text-body-medium" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
-            {mode === 'login' && 'Access verified balances and official school receipts.'}
             {mode === 'activate' && 'First-time setup using your printed bursar slip code.'}
-            {mode === 'reset' && 'Recover access to your registered student records.'}
+            {mode === 'login' && 'Access verified balances and official school receipts.'}
+            {mode === 'reset' && 'Enter your registered guardian email to receive a secure reset link.'}
           </p>
         </header>
-
-        {/* Tab Switcher (Step 1: Zero Reload URL Query Parameter Switching) */}
-        <div
-          role="tablist"
-          style={{
-            display: 'flex',
-            backgroundColor: 'var(--color-surface-container)',
-            borderRadius: '0.5rem',
-            padding: '0.25rem',
-            border: '1px solid var(--color-outline-variant)',
-          }}
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'login'}
-            onClick={() => handleModeSwitch('login')}
-            className="text-label-medium"
-            style={{
-              flex: 1,
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              backgroundColor: mode === 'login' ? 'var(--color-primary)' : 'transparent',
-              color: mode === 'login' ? 'var(--color-on-primary)' : 'var(--color-on-surface)',
-              transition: 'background-color 0.15s ease',
-            }}
-          >
-            Sign In
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'activate'}
-            onClick={() => handleModeSwitch('activate')}
-            className="text-label-medium"
-            style={{
-              flex: 1,
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              backgroundColor: mode === 'activate' ? 'var(--color-primary)' : 'transparent',
-              color: mode === 'activate' ? 'var(--color-on-primary)' : 'var(--color-on-surface)',
-              transition: 'background-color 0.15s ease',
-            }}
-          >
-            Activate
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === 'reset'}
-            onClick={() => handleModeSwitch('reset')}
-            className="text-label-medium"
-            style={{
-              flex: 1,
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              backgroundColor: mode === 'reset' ? 'var(--color-primary)' : 'transparent',
-              color: mode === 'reset' ? 'var(--color-on-primary)' : 'var(--color-on-surface)',
-              transition: 'background-color 0.15s ease',
-            }}
-          >
-            Reset PIN
-          </button>
-        </div>
 
         {/* Status Notification */}
         {statusMessage && (
@@ -415,7 +554,7 @@ export function AuthUnifiedForm() {
             style={{
               padding: '1rem',
               borderRadius: '0.5rem',
-              backgroundColor: statusMessage.type === 'success' ? 'var(--color-surface-container)' : '#FEF2F2',
+              backgroundColor: statusMessage.type === 'success' ? '#F0FDF4' : '#FEF2F2',
               border: `1px solid ${statusMessage.type === 'success' ? 'var(--color-primary)' : 'var(--color-error)'}`,
               color: statusMessage.type === 'success' ? 'var(--color-primary)' : 'var(--color-error)',
               fontSize: '0.875rem',
@@ -447,56 +586,59 @@ export function AuthUnifiedForm() {
           </div>
         )}
 
-        {/* The Unified Form */}
+        {/* The Card Form: White Background, Border, and Drop Shadow per Design System */}
         <form
           onSubmit={handleSubmit}
           noValidate
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '1rem',
-            padding: '1.5rem',
-            backgroundColor: 'var(--color-surface-container)',
+            gap: '1.25rem',
+            padding: '2rem 1.75rem',
+            backgroundColor: '#FFFFFF',
             borderRadius: '0.75rem',
             border: '1px solid var(--color-outline-variant)',
+            boxShadow: 'var(--shadow-medium)',
           }}
         >
-          {/* Field: Parent Phone (Text input with numeric inputMode, Step 4) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-            <label htmlFor="phone" className="text-label-medium">
-              Parent Phone Number
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              type="text"
-              inputMode="numeric"
-              required
-              aria-required="true"
-              aria-invalid={Boolean(errors.phone)}
-              aria-describedby={errors.phone ? 'phone-error' : undefined}
-              value={phone}
-              onChange={handlePhoneChange}
-              onBlur={(e) => handleBlur('phone', e.target.value)}
-              style={{
-                padding: '0.625rem 0.75rem',
-                borderRadius: '0.375rem',
-                border: `1px solid ${errors.phone ? 'var(--color-error)' : 'var(--color-outline)'}`,
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-on-surface)',
-                fontSize: '0.875rem',
-                outline: 'none',
-              }}
-            />
-            {/* Step 6: Caution icon beside error */}
-            {errors.phone && (
-              <span id="phone-error" role="alert" style={{ fontSize: '0.75rem', color: 'var(--color-error)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                ⚠️ {errors.phone}
-              </span>
-            )}
-          </div>
+          {/* Field: Parent Phone / Email (Only on Activate and Login) */}
+          {mode !== 'reset' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+              <label htmlFor="phone" className="text-label-medium">
+                {mode === 'login' ? 'Phone Number or Email Address' : 'Parent Phone Number'}
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type={mode === 'login' && phone.includes('@') ? 'email' : 'text'}
+                inputMode={mode === 'login' ? (phone.includes('@') ? 'email' : 'text') : 'numeric'}
+                autoComplete={mode === 'login' ? 'username' : 'tel'}
+                required
+                aria-required="true"
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? 'phone-error' : undefined}
+                value={phone}
+                onChange={handlePhoneChange}
+                onBlur={(e) => handleBlur('phone', e.target.value)}
+                style={{
+                  padding: '0.625rem 0.75rem',
+                  borderRadius: '0.375rem',
+                  border: `1px solid ${errors.phone ? 'var(--color-error)' : 'var(--color-outline)'}`,
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-on-surface)',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                }}
+              />
+              {errors.phone && (
+                <span id="phone-error" role="alert" style={{ fontSize: '0.75rem', color: 'var(--color-error)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  ⚠️ {errors.phone}
+                </span>
+              )}
+            </div>
+          )}
 
-          {/* Field: Guardian Email (Category 3: Only on activate and reset) */}
+          {/* Field: Guardian Email (On Activate and Reset) */}
           {mode !== 'login' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               <label htmlFor="email" className="text-label-medium">
@@ -511,7 +653,6 @@ export function AuthUnifiedForm() {
                 aria-required="true"
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? 'email-error' : (mode === 'activate' && email.length > 0 && !errors.email ? 'email-success' : undefined)}
-                placeholder="e.g. parent@example.com"
                 value={email}
                 onChange={handleEmailChange}
                 onBlur={(e) => handleBlur('email', e.target.value)}
@@ -617,11 +758,11 @@ export function AuthUnifiedForm() {
             </div>
           )}
 
-          {/* Mode-Specific Field: PIN (Only for Login, Step 4 & 7) */}
-          {mode === 'login' && (
+          {/* PIN Field (On Login and Activate) */}
+          {(mode === 'login' || mode === 'activate') && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               <label htmlFor="pin" className="text-label-medium">
-                Security PIN
+                {mode === 'login' ? 'Security PIN' : 'Create 4-Digit Security PIN'}
               </label>
               <input
                 id="pin"
@@ -648,7 +789,9 @@ export function AuthUnifiedForm() {
               {/* Step 7: Hint appears only once typing begins */}
               {pin.length > 0 && pin.length < 4 && (
                 <span id="pin-hint" style={{ fontSize: '0.75rem', color: 'var(--color-on-surface-variant)' }}>
-                  PIN must be 4 digits ({4 - pin.length} remaining).
+                  {mode === 'login'
+                    ? `PIN must be 4 digits (${4 - pin.length} remaining).`
+                    : `Set a secret 4-digit PIN for future sign-ins (${4 - pin.length} remaining).`}
                 </span>
               )}
               {errors.pin && (
@@ -688,12 +831,13 @@ export function AuthUnifiedForm() {
           )}
 
           {/* Submit Button (Step 7: Disabled until valid, explains itself on click) */}
-          <div style={{ width: '100%', marginTop: '0.5rem' }}>
+          <div style={{ width: '100%', marginTop: '0.25rem' }}>
             <button
               type="submit"
-              aria-disabled={!isFormValid}
+              disabled={isSubmitting}
+              aria-disabled={!isFormValid || isSubmitting}
               onClick={(e) => {
-                if (!isFormValid) {
+                if (!isFormValid || isSubmitting) {
                   e.preventDefault();
                   triggerValidationAndExplain();
                 }
@@ -706,19 +850,52 @@ export function AuthUnifiedForm() {
                 color: isFormValid ? 'var(--color-on-primary)' : 'var(--color-on-surface-variant)',
                 border: 'none',
                 borderRadius: '0.5rem',
-                cursor: isFormValid ? 'pointer' : 'not-allowed',
-                opacity: isFormValid ? 1 : 0.6,
+                cursor: isFormValid && !isSubmitting ? 'pointer' : 'not-allowed',
+                opacity: isFormValid && !isSubmitting ? 1 : 0.6,
                 transition: 'all 0.15s ease',
               }}
             >
-              {mode === 'login' && 'Sign In to Portal'}
-              {mode === 'activate' && 'Activate Account'}
-              {mode === 'reset' && 'Request PIN Reset'}
+              {isSubmitting
+                ? 'Processing...'
+                : mode === 'activate'
+                ? 'Activate Account'
+                : mode === 'login'
+                ? 'Sign In to Portal'
+                : 'Request PIN Reset'}
             </button>
           </div>
+
+          {/* Bottom of Form: Only Reset PIN on Sign In */}
+          {mode === 'login' && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '0.25rem',
+                paddingTop: '0.75rem',
+                borderTop: '1px solid var(--color-outline-variant)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => handleModeSwitch('reset')}
+                className="text-label-medium"
+                style={{
+                  color: 'var(--color-primary)',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                }}
+              >
+                Reset PIN
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </main>
   );
 }
-

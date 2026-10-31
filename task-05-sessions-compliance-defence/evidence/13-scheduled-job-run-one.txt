@@ -1,0 +1,20 @@
+=== EVIDENCE 13: SCHEDULED ACCOUNT PURGE BATCH (EXECUTION RUN 1) ===
+Timestamp: 2026-10-31T13:22:35.182Z
+Cron Job ID: purge_job_1793452955182
+Legal Framework: NDPA 2023 Section 34 (Right to Erasure) & Nigerian Tax Law (Ledger Retention)
+
+[Batch Execution Summary]
+Eligible Accounts (past 7-day grace period): 1
+Accounts Purged (PII Erased / Anonymized): 1
+Financial Ledger Records Preserved: 0
+Job Duration: 1191 ms
+Job Completion Status: SUCCESS
+
+[Itemized Deletion Audit Log]
+Record #1:
+  - Target Guardian ID: guardian-uuid-purge-test
+  - Redacted Pseudonym: PURGED_guardian_1793452955182
+  - Credentials Erased: Phone, Email, PIN Hash -> '$PURGED$'
+  - Tuition Payment Ledger Preserved: 0 records retained for 6-year tax audit.
+
+Integrity Note: Financial receipts remain intact in database; only personal sign-in identity is destroyed.

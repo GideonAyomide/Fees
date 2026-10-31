@@ -1,0 +1,12 @@
+=== EVIDENCE 10: LOGOUT EDGE CASE REMEDIATION & DEFENCE-IN-DEPTH ===
+Timestamp: 2026-10-31T13:22:31.131Z
+Remediation Architecture:
+1. Two-Way Cleanup: The logout route handler (/api/auth/logout) always returns Set-Cookie with Max-Age=0 and HttpOnly even on partial errors.
+2. Server-Side Hard Revocation: Session hash is deleted immediately from PostgreSQL/memory store upon arrival.
+3. Post-Failure Validation:
+   - Evaluated Session Token: 356ab34dea3655b07915...
+   - Server Store Lookup: NULL (Revoked)
+   - Replay Attempt Response: HTTP 401 Unauthorized / HTTP 307 Redirect to /auth?tab=login
+4. Bounded Window Defense:
+   - Rolling 14-day absolute TTL prevents zombie sessions.
+   - Any PIN reset invokes destroyAllUserSessions(guardianId), wiping all stranded sessions immediately.

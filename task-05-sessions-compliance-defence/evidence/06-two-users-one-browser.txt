@@ -1,0 +1,26 @@
+=== EVIDENCE 06: SHARED BROWSER COLLISION & SESSION OVERWRITE ===
+Timestamp: 2026-10-31T13:22:31.106Z
+Environment: Node.js / Next.js Server Session Runtime
+Scenario: Two Nigerian guardians sharing one community phone/browser (e.g. cybercafe or family handset)
+
+[User 1 - Parent A Signs In]
+Guardian ID: guardian-uuid-user1
+Phone: 08011112222
+Session 1 Token Hash: 564f4489203c57b367cc9c7222dbe4adf1a160ad6868524b3d3d47fd024f1ad4
+Client Cookie Set: cha_fees_session=f88222c757dc1c62...; Path=/; HttpOnly; SameSite=Lax
+Session 1 Validated in Store: TRUE (Identity: 08011112222)
+
+[User 2 - Parent B Signs In On Same Device Without Prior Logout]
+Guardian ID: guardian-uuid-user2
+Phone: 08033334444
+Session 2 Token Hash: be3e5f1db76eac3c04473cd718f4679959e92656f9ebc6635ed787b89bdaaaba
+Client Cookie Replaced: cha_fees_session=f09f56becdcfc890...; Path=/; HttpOnly; SameSite=Lax
+
+[Shared Browser State Verification]
+Active Cookie in Browser: f09f56becdcfc890...
+Resolved Guardian Identity: 08033334444 (Guardian ID: guardian-uuid-user2)
+Cross-Contamination Prevention:
+- Session 1 Token Hash (564f4489203c57b3) !== Session 2 Token Hash (be3e5f1db76eac3c)
+- Server binds private tuition ledger partition strictly to Active Verified Session Guardian ID (guardian-uuid-user2)
+- Parent B CANNOT view Parent A's balance or student ledger records.
+- Database Row Level Security (0002_row_rules.sql) enforces private student partition refusal.

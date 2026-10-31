@@ -7,6 +7,98 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// -------------------------------------------------------------
+// Crown Heights Academy Fees Relational Schema
+// Specified in task-04-server-security/docs/schema.md
+// -------------------------------------------------------------
+
+// Model 1: The People Who Use the System
+model Guardian {
+  id                String    @id @default(uuid())
+  phone             String    @unique
+  email             String?   @unique
+  pinHash           String
+  status            String    @default("ACTIVE") // ACTIVE, PENDING_VERIFICATION, LOCKED
+  failedPinAttempts Int       @default(0)
+  termsAccepted     Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  sessions          Session[]
+  students          Student[]
+}
+
+// Model 2: Student School Enrolment & Financial Ledger Partition
+model Student {
+  id              String           @id @default(uuid())
+  admissionNumber String           @unique
+  fullName        String
+  classLevel      String           // JSS1, JSS2, JSS3, SS1, SS2, SS3
+  guardianPhone   String
+  guardian        Guardian?        @relation(fields: [guardianPhone], references: [phone])
+  slipCodeHash    String
+  balanceKobo     BigInt           @default(0) // Whole kobo integers
+  postedUpTo      DateTime?        // Bursar's official ledger stamp date
+  createdAt       DateTime         @default(now())
+
+  payments        Payment[]
+  paymentAttempts PaymentAttempt[]
+
+  @@index([guardianPhone])
+}
+
+// Model 3: Authenticated Server-Side Sessions (Hash-at-Rest)
+model Session {
+  id               String   @id @default(uuid())
+  sessionTokenHash String   @unique // SHA-256 hash of plaintext cookie token
+  guardianId       String
+  guardian         Guardian @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  ipAddress        String
+  userAgent        String?
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@index([guardianId])
+  @@index([expiresAt])
+}
+
+// Model 4: Settled Financial Records (The Money Table)
+model Payment {
+  id               String   @id @default(uuid())
+  reference        String   @unique // Merchant reference: CHA-PAY-2026-XXXX
+  studentId        String
+  student          Student  @relation(fields: [studentId], references: [id])
+  amountKobo       BigInt   // Whole kobo integer
+  channel          String   // CARD, BANK_TRANSFER, USSD
+  flwTransactionId String?  @unique // Verified Flutterwave Transaction ID
+  status           String   @default("SUCCESSFUL")
+  reconciled       Boolean  @default(false) // Stamped when copied to cash book
+  paidAt           DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  @@index([studentId])
+}
+
+// Model 5: Dropped/Failed Transactions (Audit Log Table)
+model PaymentAttempt {
+  id            String   @id @default(uuid())
+  reference     String   @unique
+  studentId     String
+  student       Student  @relation(fields: [studentId], references: [id])
+  amountKobo    BigInt
+  channel       String?
+  failureReason String?
+  status        String   @default("ABANDONED") // ABANDONED, FAILED, TIMEOUT
+  ipAddress     String
+  userAgent     String?
+  attemptedAt   DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@index([studentId])
+  @@index([status])
+}
+
+// Model 6: Task Two Diagnostic Enquiry Model (Preserved)
 model Enquiry {
   id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
@@ -15,4 +107,3 @@ model Enquiry {
   message     String
   status      String   @default("PENDING")
 }
-

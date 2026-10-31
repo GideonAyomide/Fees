@@ -120,7 +120,6 @@ export default function VerifyPage() {
               maxLength={6}
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              placeholder="e.g. 582910"
               className="w-full px-3 py-2 text-lg tracking-widest text-center font-mono border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]"
               required
             />

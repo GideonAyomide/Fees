@@ -1,0 +1,16 @@
+=== EVIDENCE 09: LOGOUT NETWORK FAILURE (CLIENT-SERVER DISCONNECT) ===
+Timestamp: 2026-10-31T13:22:31.109Z
+Scenario: Parent clicks "Sign Out" at school gate, but cellular data drops before HTTP POST /api/auth/logout reaches server.
+
+[Initial State]
+Session Token: 356ab34dea3655b07915...
+Server Session Token Hash: 658988069f12d86769140f8d9f07993ec643e6afaf4148ab9887d48e8c7200e1
+Server Status: ACTIVE (Expires: 2026-11-14T13:22:31.109Z)
+
+[Simulated Event: Network Failure on POST /api/auth/logout]
+HTTP Status: ECONNRESET / Network Error
+Client Action: Browser JavaScript clears local cookie in catch block (document.cookie = "cha_fees_session=; Max-Age=0").
+Server State: Server never received logout packet; session record still exists in server store.
+Risk Analysis:
+- If cookie was wiped from browser, local device cannot make authenticated requests.
+- HOWEVER, if an attacker intercepted or sniffed the raw token prior to disconnect, the server-side token remains technically valid until TTL expiry.

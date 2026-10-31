@@ -1,0 +1,16 @@
+=== EVIDENCE 14: SCHEDULED ACCOUNT PURGE IDEMPOTENCY (EXECUTION RUN 2) ===
+Timestamp: 2026-10-31T13:22:36.374Z
+Cron Job ID: purge_job_1793452956374
+Scenario: Scheduled cron job fires again on schedule (e.g. 5 minutes later or next day).
+
+[Batch Execution Summary]
+Eligible Accounts: 0
+Accounts Purged: 0
+Financial Ledger Records Mutated: 0
+Job Duration: 0 ms
+Job Completion Status: SUCCESS (IDEMPOTENT NO-OP)
+
+[Verification of Idempotency]
+- Already-purged accounts were SKIPPED without throwing errors or duplicate writes.
+- Database state remains identical before and after Run 2.
+- Proves safe recurring automated cron execution without side effects.

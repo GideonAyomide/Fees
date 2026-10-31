@@ -1,0 +1,27 @@
+=== TASK FIVE STEP 1: TWO FRESH SESSION IDENTIFIERS EVIDENCE ===
+Target Endpoint: POST /api/auth/login
+User Account: Fatima Abubakar (Phone: 08012345678)
+Timestamp: 2026-10-30T23:01:02+01:00
+Environment: Node.js v20.18.0 (Windows x64 / localhost:3000)
+
+Login Attempt 1:
+--------------------------------------------------------------------------------
+HTTP Status: 200 OK
+Session Row ID: 2b6451ac-5dd9-4e46-b16e-0fb43554efb9
+Stored Token Hash (SHA-256): a34fe0d83f37f0fa9035eaa9fcd228c436f66958b15210ec9f539fc61a7672dd
+Transmitted Cookie Header:
+cha_fees_session=8f358028949d3a5f16b76b4cde246b7a100f9b18370a5d264b95aa79b1d64ed2; Path=/; Expires=Fri, 13 Nov 2026 22:01:02 GMT; Max-Age=1209600; HttpOnly; SameSite=lax
+
+Login Attempt 2 (Consecutive sign-in for same user):
+--------------------------------------------------------------------------------
+HTTP Status: 200 OK
+Session Row ID: 3eacc17e-86a2-4893-8eb2-8edfe04b4681
+Stored Token Hash (SHA-256): f460811588bdbd179165fe1b5c73ac8da3cf62d3f1dd31fdf3136986da6765ef
+Transmitted Cookie Header:
+cha_fees_session=2c9b755a148d3704398d222f009826cd1959871829d030bf9f517100958b283d; Path=/; Expires=Fri, 13 Nov 2026 22:01:02 GMT; Max-Age=1209600; HttpOnly; SameSite=lax
+
+Verification of Invariants:
+1. Freshness: Both session IDs (2b6451ac vs 3eacc17e) and token values are 100% distinct. Zero identifier reuse occurs.
+2. Hash at Rest: Only the SHA-256 digests are stored in the server session table; the raw cookie values are never persisted in plaintext.
+3. Cookie Security Flags: HttpOnly (blocks XSS access), SameSite=Lax (mitigates CSRF), Path=/ (scoped to domain root), Max-Age=1209600 (14 days).
+
