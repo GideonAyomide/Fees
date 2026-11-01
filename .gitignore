@@ -24,3 +24,14 @@ Thumbs.db
 .idea/
 
 .neon
+
+# Context and agent folders
+.agent/
+agent/
+skills/
+rules/
+
+# Non-functional / external context specification markdown files
+AGENTS.md
+docs/Fees-PRD-v2-Flutterwave.md
+docs/
