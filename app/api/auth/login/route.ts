@@ -211,11 +211,27 @@ export async function POST(request: NextRequest) {
       name: SESSION_COOKIE_NAME,
       value: rawToken,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // Enforce Secure flag for modern secure contexts and curriculum compliance
       sameSite: 'lax',
       path: '/',
       maxAge: Math.floor(SESSION_TTL_MS / 1000),
     });
+
+    // If staff user (BURSAR), issue staff claim cookie for admin route authorisation
+    if (user.role === 'BURSAR') {
+      response.cookies.set({
+        name: 'cha_staff_role',
+        value: 'BURSAR',
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: Math.floor(SESSION_TTL_MS / 1000),
+      });
+    } else {
+      // Clear any prior staff cookie if an ordinary parent logs in on a shared browser
+      response.cookies.delete('cha_staff_role');
+    }
 
     return response;
   } catch {

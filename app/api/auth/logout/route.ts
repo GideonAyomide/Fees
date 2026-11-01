@@ -23,12 +23,23 @@ export async function POST(request: NextRequest) {
     phone: existingSession?.phone,
   });
 
-  // Clear cookie on response
+  // Clear cookies on response
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
     value: '',
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+    expires: new Date(0),
+  });
+
+  response.cookies.set({
+    name: 'cha_staff_role',
+    value: '',
+    httpOnly: true,
+    secure: true,
     sameSite: 'lax',
     path: '/',
     maxAge: 0,

@@ -108,26 +108,35 @@ export function verifyCode(email: string, inputCode: string): {
     };
   }
 
-  // 2. Expiration Window Check (10-minute rule)
+  // 2. Expiration Check (10-minute validity)
   if (Date.now() > record.expiresAt) {
     return {
       success: false,
       status: 'EXPIRED',
-      error: 'This verification code has expired. Please request a new code.',
+      error: 'This verification code has expired. Codes are only valid for 10 minutes. Please request a new code.',
     };
   }
 
-  // 3. Code Match Check
+  // 3. Increment Attempt Counter (Rate limit / Brute force guard)
+  record.attempts += 1;
+  if (record.attempts > 5) {
+    return {
+      success: false,
+      status: 'EXPIRED',
+      error: 'Too many incorrect attempts. For security, this verification code is invalidated. Please request a new code.',
+    };
+  }
+
+  // 4. Exact Match Verification
   if (record.code !== inputCode.trim()) {
-    record.attempts += 1;
     return {
       success: false,
       status: 'WRONG_CODE',
-      error: 'Invalid verification code. Please check your email and try again.',
+      error: 'Incorrect verification code. Please check your email and try again.',
     };
   }
 
-  // Success: mark used immediately (single-use guarantee)
+  // Success: mark as consumed
   record.used = true;
   return {
     success: true,
@@ -136,9 +145,14 @@ export function verifyCode(email: string, inputCode: string): {
 }
 
 /**
- * Task Four Step 11: Render Branded Email HTML
- * Built strictly with Task One Design System Tokens:
- * Primary: #0F3D2E, Accent: #2D7A5D, Surface: #F8F9FA, On-Surface: #1F2937
+ * Renders the HTML body of a branded transactional verification email.
+ * Built strictly with Task One Design System Tokens (styles/tokens.css):
+ * - Primary 40: #2563EB (Royal Blue)
+ * - Primary Container: #DBE1FF (Soft Blue)
+ * - On-Primary Container: #003EA8 (Deep Institutional Blue)
+ * - Surface: #F9F9FF (Neutral Surface)
+ * - On-Surface: #161C25 (Charcoal Body)
+ * - Warning: #B45309 (Warning 40)
  */
 export function renderBrandedVerificationEmail(code: string, parentName: string = 'Parent / Guardian'): string {
   return `<!DOCTYPE html>
@@ -148,22 +162,22 @@ export function renderBrandedVerificationEmail(code: string, parentName: string 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Crown Heights Academy Verification Code</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #F8F9FA; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8F9FA; padding: 40px 16px;">
+<body style="margin: 0; padding: 0; background-color: #F9F9FF; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #161C25;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F9F9FF; padding: 40px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width: 560px; background-color: #FFFFFF; border-radius: 8px; border: 1px solid #E5E7EB; box-shadow: 0 4px 6px -1px rgba(15, 61, 46, 0.08); overflow: hidden;">
+        <table role="presentation" width="100%" style="max-width: 560px; background-color: #FFFFFF; border-radius: 8px; border: 1px solid #DEE2F1; box-shadow: 0 4px 24px rgba(37, 99, 235, 0.08); overflow: hidden;">
           
-          <!-- Header Bar: Primary 40 (#0F3D2E) -->
+          <!-- Header Bar: Primary 40 (#2563EB - Royal Blue from tokens.css) -->
           <tr>
-            <td style="background-color: #0F3D2E; padding: 24px 32px; text-align: left;">
+            <td style="background-color: #2563EB; padding: 24px 32px; text-align: left;">
               <table role="presentation" width="100%">
                 <tr>
                   <td>
                     <div style="font-size: 20px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.02em;">
                       CROWN HEIGHTS ACADEMY
                     </div>
-                    <div style="font-size: 13px; color: #A7F3D0; font-weight: 500; margin-top: 4px;">
+                    <div style="font-size: 13px; color: #DBE1FF; font-weight: 500; margin-top: 4px;">
                       Official Bursary & School Fees Portal
                     </div>
                   </td>
@@ -175,39 +189,39 @@ export function renderBrandedVerificationEmail(code: string, parentName: string 
           <!-- Content Body -->
           <tr>
             <td style="padding: 32px; text-align: left;">
-              <h1 style="font-size: 20px; font-weight: 700; color: #0F3D2E; margin: 0 0 16px 0; line-height: 1.4;">
+              <h1 style="font-size: 20px; font-weight: 700; color: #2563EB; margin: 0 0 16px 0; line-height: 1.4;">
                 Confirm Your Account Activation
               </h1>
               
-              <p style="font-size: 15px; line-height: 1.6; color: #374151; margin: 0 0 24px 0;">
+              <p style="font-size: 15px; line-height: 1.6; color: #424752; margin: 0 0 24px 0;">
                 Dear ${parentName},
               </p>
               
-              <p style="font-size: 15px; line-height: 1.6; color: #374151; margin: 0 0 24px 0;">
+              <p style="font-size: 15px; line-height: 1.6; color: #424752; margin: 0 0 24px 0;">
                 To complete your registration on the Crown Heights Academy Fees portal, enter the 6-digit verification code below:
               </p>
 
-              <!-- Code Highlight Box: Surface-Variant (#F0FDF4) & Accent Border (#2D7A5D) -->
-              <div style="background-color: #F0FDF4; border: 2px solid #2D7A5D; border-radius: 8px; padding: 24px; text-align: center; margin: 0 0 24px 0;">
-                <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #0F3D2E; margin-bottom: 8px;">
+              <!-- Code Highlight Box: Primary Container (#DBE1FF) & Primary Border (#2563EB) -->
+              <div style="background-color: #DBE1FF; border: 2px solid #2563EB; border-radius: 8px; padding: 24px; text-align: center; margin: 0 0 24px 0;">
+                <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #003EA8; margin-bottom: 8px;">
                   Your Verification Code
                 </div>
-                <div style="font-size: 36px; font-weight: 800; letter-spacing: 0.25em; color: #0F3D2E; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;">
+                <div style="font-size: 36px; font-weight: 800; letter-spacing: 0.25em; color: #003EA8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;">
                   ${code}
                 </div>
-                <div style="font-size: 13px; color: #4B5563; margin-top: 8px;">
+                <div style="font-size: 13px; color: #424752; margin-top: 8px;">
                   Expires in <strong>10 minutes</strong> (Single-use only)
                 </div>
               </div>
 
               <!-- Security Information Note -->
-              <div style="background-color: #FEF3C7; border-left: 4px solid #D97706; padding: 12px 16px; margin: 0 0 24px 0; border-radius: 4px;">
-                <p style="font-size: 13px; line-height: 1.5; color: #92400E; margin: 0;">
+              <div style="background-color: #FFF8E1; border-left: 4px solid #B45309; padding: 12px 16px; margin: 0 0 24px 0; border-radius: 4px;">
+                <p style="font-size: 13px; line-height: 1.5; color: #7C2D12; margin: 0;">
                   <strong>Security Note:</strong> Crown Heights Academy staff will never ask you for this code on phone calls or WhatsApp. Do not share it with anyone.
                 </p>
               </div>
 
-              <p style="font-size: 14px; line-height: 1.5; color: #6B7280; margin: 0 0 8px 0;">
+              <p style="font-size: 14px; line-height: 1.5; color: #747985; margin: 0 0 8px 0;">
                 If you did not request this verification code, please disregard this email or report to the Bursar immediately.
               </p>
             </td>
@@ -215,11 +229,11 @@ export function renderBrandedVerificationEmail(code: string, parentName: string 
 
           <!-- Footer: Brand Accent Outline & Legal -->
           <tr>
-            <td style="background-color: #F9FAFB; padding: 20px 32px; border-top: 1px solid #E5E7EB; text-align: center;">
-              <p style="font-size: 12px; line-height: 1.5; color: #6B7280; margin: 0 0 4px 0;">
+            <td style="background-color: #F9F9FF; padding: 20px 32px; border-top: 1px solid #DEE2F1; text-align: center;">
+              <p style="font-size: 12px; line-height: 1.5; color: #747985; margin: 0 0 4px 0;">
                 Crown Heights Academy · Bursary & Student Financial Records
               </p>
-              <p style="font-size: 11px; line-height: 1.4; color: #9CA3AF; margin: 0;">
+              <p style="font-size: 11px; line-height: 1.4; color: #858A98; margin: 0;">
                 Official Parent Portal · All transactions processed via Flutterwave · Verified by Bursar
               </p>
             </td>
@@ -232,4 +246,3 @@ export function renderBrandedVerificationEmail(code: string, parentName: string 
 </body>
 </html>`;
 }
-
