@@ -1,12 +1,25 @@
 import React from 'react';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { SignOutButton } from '@/components/sign-out-button';
+import { getSession, SESSION_COOKIE_NAME } from '@/lib/session';
 
 export const metadata = {
   title: 'Parent Dashboard | Crown Heights Academy Fees',
   description: 'Verified student term fee balance, line items, and official payment receipts',
 };
 
-export default function ParentDashboardPage() {
+export default async function ParentDashboardPage() {
+  // Step 5: Password Reset Kills Everything & Active Session Verification
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const session = sessionToken ? getSession(sessionToken) : null;
+
+  if (!session) {
+    redirect('/auth?tab=login&revoked=true');
+  }
+
   // Demonstration student financial partition data (whole kobo integers)
   const student = {
     fullName: 'Fatima Abubakar',
@@ -107,17 +120,7 @@ export default function ParentDashboardPage() {
             >
               Guardian Session
             </span>
-            <Link
-              href="/auth?tab=login"
-              style={{
-                fontSize: '0.8125rem',
-                color: 'white',
-                textDecoration: 'underline',
-                fontWeight: 500,
-              }}
-            >
-              Sign Out
-            </Link>
+            <SignOutButton />
           </div>
         </div>
       </header>

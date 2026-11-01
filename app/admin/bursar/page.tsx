@@ -1,12 +1,24 @@
 import React from 'react';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { SignOutButton } from '@/components/sign-out-button';
+import { getSession, SESSION_COOKIE_NAME } from '@/lib/session';
 
 export const metadata = {
   title: 'Bursar Administration | Crown Heights Academy Fees',
   description: 'Internal ledger, fee management, and access code administration portal',
 };
 
-export default function BursarAdminPage() {
+export default async function BursarAdminPage() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const session = sessionToken ? getSession(sessionToken) : null;
+
+  if (!session || session.role !== 'BURSAR') {
+    redirect('/auth?tab=login');
+  }
+
   return (
     <div
       style={{
@@ -65,17 +77,7 @@ export default function BursarAdminPage() {
           >
             Role: BURSAR
           </span>
-          <Link
-            href="/auth?tab=login"
-            style={{
-              color: 'white',
-              fontSize: '0.8125rem',
-              textDecoration: 'underline',
-              fontWeight: 500,
-            }}
-          >
-            Sign Out
-          </Link>
+          <SignOutButton />
         </div>
       </header>
 

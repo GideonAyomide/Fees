@@ -19,8 +19,8 @@ export function AuthUnifiedForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Activate is the default authentication entry point
-  const urlParam = searchParams.get('mode') as AuthMode;
+  // Activate is the default authentication entry point (supports ?mode=... and ?tab=...)
+  const urlParam = (searchParams.get('mode') || searchParams.get('tab')) as AuthMode;
   const initialMode: AuthMode = urlParam === 'login' || urlParam === 'reset' ? urlParam : 'activate';
   const [mode, setMode] = useState<AuthMode>(initialMode);
 
@@ -41,7 +41,7 @@ export function AuthUnifiedForm() {
 
   // Keep internal state synced when URL changes
   useEffect(() => {
-    const urlMode = searchParams.get('mode') as AuthMode;
+    const urlMode = (searchParams.get('mode') || searchParams.get('tab')) as AuthMode;
     if (urlMode === 'login' || urlMode === 'reset' || urlMode === 'activate') {
       setMode(urlMode);
     } else {
@@ -49,8 +49,23 @@ export function AuthUnifiedForm() {
     }
   }, [searchParams]);
 
-  // Mode Switcher (Updates URL without page reload)
+  // Mode Switcher (Updates URL without page reload and preserves user state)
   const handleModeSwitch = (newMode: AuthMode) => {
+    // State preservation: Carry over entered credentials (Task Five Evidence 15)
+    if (newMode === 'reset') {
+      if (phone && phone.includes('@')) {
+        setEmail(phone.trim());
+      }
+    } else if (newMode === 'login') {
+      if (email && email.includes('@')) {
+        setPhone(email.trim());
+      }
+    } else if (newMode === 'activate') {
+      if (phone && phone.includes('@') && !email) {
+        setEmail(phone.trim());
+      }
+    }
+
     setMode(newMode);
     setStatusMessage(null);
     setDisabledButtonClickReason(null);
@@ -142,6 +157,10 @@ export function AuthUnifiedForm() {
     } else {
       // Sign In mode: accepts phone or email, do not strip non-digits
       setPhone(raw);
+      // Immediately sync with email state if an email address is being entered
+      if (raw.includes('@')) {
+        setEmail(raw);
+      }
       if (touched.phone) {
         setErrors((prev) => ({ ...prev, phone: validateField('phone', raw) }));
       }
@@ -154,6 +173,9 @@ export function AuthUnifiedForm() {
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setEmail(val);
+    if (mode === 'reset' && val.includes('@')) {
+      setPhone(val);
+    }
     setDisabledButtonClickReason(null);
 
     if (mode === 'activate' || mode === 'reset') {
@@ -547,6 +569,31 @@ export function AuthUnifiedForm() {
           </p>
         </header>
 
+        {/* Session Terminated / Revoked Security Alert (Step 5: Password Reset Kills Everything) */}
+        {searchParams.get('revoked') === 'true' && (
+          <div
+            role="alert"
+            style={{
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid var(--color-error, #BA1A1A)',
+              color: 'var(--color-error, #BA1A1A)',
+              fontSize: '0.875rem',
+              lineHeight: 1.5,
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+            }}
+          >
+            <span style={{ fontSize: '1.25rem' }}>🔒</span>
+            <div>
+              <strong>Session Terminated Across All Devices:</strong> A security PIN reset was requested. All existing active sessions have been invalidated for your security. Please sign in again.
+            </div>
+          </div>
+        )}
+
         {/* Status Notification */}
         {statusMessage && (
           <div
@@ -865,7 +912,7 @@ export function AuthUnifiedForm() {
             </button>
           </div>
 
-          {/* Bottom of Form: Only Reset PIN on Sign In */}
+          {/* Bottom of Form: Mode Switches between Login and Reset */}
           {mode === 'login' && (
             <div
               style={{
@@ -890,7 +937,36 @@ export function AuthUnifiedForm() {
                   padding: 0,
                 }}
               >
-                Reset PIN
+                Forgot PIN? Reset here
+              </button>
+            </div>
+          )}
+
+          {mode === 'reset' && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '0.25rem',
+                paddingTop: '0.75rem',
+                borderTop: '1px solid var(--color-outline-variant)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => handleModeSwitch('login')}
+                className="text-label-medium"
+                style={{
+                  color: 'var(--color-primary)',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                }}
+              >
+                Remember your PIN? Sign In here
               </button>
             </div>
           )}

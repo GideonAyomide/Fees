@@ -58,6 +58,7 @@ Task Five completes the production lifecycle. It addresses the realities of user
 ## 3. Directory Map for Task Five Deliverables
 
 ### Technical Documentation (`docs/`)
+- [`docs/defects.md`](file:///c:/Users/HP/Desktop/Fees/task-05-sessions-compliance-defence/docs/defects.md) — Production defects, failure mode line numbers, and operational cost analysis.
 - [`docs/sessions.md`](file:///c:/Users/HP/Desktop/Fees/task-05-sessions-compliance-defence/docs/sessions.md) — Session hijacking threats, cookie injection defense, and server-side destruction.
 - [`docs/gating.md`](file:///c:/Users/HP/Desktop/Fees/task-05-sessions-compliance-defence/docs/gating.md) — Hard vs. soft gating trade-off analysis and tuition ledger privacy justification.
 - [`docs/retention-matrix.md`](file:///c:/Users/HP/Desktop/Fees/task-05-sessions-compliance-defence/docs/retention-matrix.md) — Table-by-table retention schedules and NDPA erasure vs. CAMA tax conflicts.
@@ -72,11 +73,22 @@ Task Five completes the production lifecycle. It addresses the realities of user
 - [`privacy.md`](file:///c:/Users/HP/Desktop/Fees/task-05-sessions-compliance-defence/privacy.md) — Plain-English parent privacy notice tailored for Nigerian families.
 - [`privacy-draft-with-broken-promise.md`](file:///c:/Users/HP/Desktop/Fees/task-05-sessions-compliance-defence/privacy-draft-with-broken-promise.md) — Audit and removal of the unauthenticated verbal deletion clause.
 
-### Machine-Verified Evidence (`evidence/`)
+### Verified Evidence Suite (`evidence/`) — Page 36 Curriculum
 - `evidence/01-two-session-ids.txt` — Proof of fresh, non-reused session IDs and token hashes.
+- `evidence/02-cookie-flags.png` — DevTools inspection of `HttpOnly; Secure; SameSite=Lax` cookie flags.
+- `evidence/03-soft-gating-flow.PNG` — Soft gating onboarding and activation registration entry point.
+- `evidence/04-hard-gating-flow.PNG` — Hard gating block for accounts in `PENDING_VERIFICATION` status.
+- `evidence/05-generic-errors-both-cases.PNG` — Identical generic 401 error message preventing user enumeration.
 - `evidence/06-two-users-one-browser.txt` — Proof of clean cookie overwrite and zero cross-family session bleed on shared devices.
-- `evidence/09-logout-network-failure.txt` — Capture of client-server disconnect failure mode.
+- `evidence/07-session-row-present.PNG` — Active `cha_fees_session` cookie and session table entry while authenticated.
+- `evidence/08-session-row-deleted.PNG` — Verified cookie deletion and session destruction immediately upon clicking Sign Out.
+- `evidence/09-logout-network-failure.txt` — Capture and risk analysis of client-server disconnect failure mode.
 - `evidence/10-logout-edge-case-fixed.txt` — Verification of server-side token invalidation and TTL defense.
-- `evidence/13-scheduled-job-run-one.txt` — Audit log of Run 1 account purge (PII scrubbed, financial records preserved).
+- `evidence/11-reset-kills-other-session.PNG` — Multi-device universal revocation: PIN reset in Window A halts and kicks Window B out of the dashboard.
+- `evidence/12-deletion-request-locks-account.png` — Administrative Data Privacy & Erasure Audit showing 7-day grace period lock.
+- `evidence/13-scheduled-job-run-one.txt` — Audit log of Run 1 account purge (PII scrubbed, financial records preserved under CAMA).
 - `evidence/14-scheduled-job-run-two.txt` — Audit log of Run 2 verifying complete idempotency (0 mutations, 0 errors).
+- `evidence/15-state-management-working.png` — Seamless state preservation: login email carried over automatically into the reset form.
+- `evidence/16-admin-route-refused.PNG` — The Copied-Link test: ordinary authenticated parent navigating to `/admin/bursar` receives HTTP 403 Forbidden.
+- `evidence/17-published-article-screenshot.PNG` — Screenshot of the 1,500-word engineering publication on slow hashing.
 

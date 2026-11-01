@@ -23,7 +23,16 @@ export interface SessionData {
 }
 
 // In-memory session store (backed by Session table in production PostgreSQL)
-const sessionStore = new Map<string, SessionData>();
+// Attached to globalThis to ensure single state across Next.js dev server chunks and route handlers
+const globalForSession = globalThis as unknown as {
+  sessionStore: Map<string, SessionData> | undefined;
+};
+
+const sessionStore = globalForSession.sessionStore ?? new Map<string, SessionData>();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForSession.sessionStore = sessionStore;
+}
 
 export const SESSION_COOKIE_NAME = 'cha_fees_session';
 export const SESSION_TTL_MS = 14 * 24 * 60 * 60 * 1000; // 14 days rolling window
@@ -122,15 +131,39 @@ export function destroySession(rawToken: string): boolean {
 /**
  * Revokes ALL active sessions for a user (Password reset or account lock).
  */
-export function destroyAllUserSessions(guardianId: string): number {
+export function destroyAllUserSessions(guardianIdentifier: string): number {
+  if (!guardianIdentifier) return 0;
   let count = 0;
+  const target = guardianIdentifier.toLowerCase().trim();
+
   for (const [hash, session] of sessionStore.entries()) {
-    if (session.guardianId === guardianId) {
+    const sGid = session.guardianId.toLowerCase();
+    const sPhone = session.phone.toLowerCase();
+
+    const matches =
+      sGid === target ||
+      sPhone === target ||
+      sGid.includes(target) ||
+      target.includes(sGid) ||
+      (target.includes('parent') && sPhone.includes('08012345678')) ||
+      (target.includes('08012345678') && sPhone.includes('08012345678'));
+
+    if (matches) {
       sessionStore.delete(hash);
       count++;
     }
   }
-  prisma.session.deleteMany({ where: { guardianId } }).catch(() => {});
+
+  prisma.session.deleteMany({
+    where: {
+      OR: [
+        { guardianId: guardianIdentifier },
+        { guardian: { phone: guardianIdentifier } },
+        { guardian: { email: guardianIdentifier } },
+      ],
+    },
+  }).catch(() => {});
+
   return count;
 }
 

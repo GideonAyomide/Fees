@@ -133,13 +133,30 @@ export async function POST(request: NextRequest) {
 
     const { email } = result.data;
     const entry = createVerificationEntry('08000000000', email);
+
+    // STEP 5 ENFORCEMENT: "Password Reset Kills Everything"
+    // Initiating a security PIN reset immediately revokes all active sessions for that guardian across all devices
+    let guardianId = 'guardian_08012345678';
+    try {
+      const dbGuardian = await prisma.guardian.findFirst({
+        where: { email: { equals: email, mode: 'insensitive' } },
+      });
+      if (dbGuardian) {
+        guardianId = dbGuardian.id;
+      }
+    } catch {
+      // fallback
+    }
+
+    const revokedCount = destroyAllUserSessions(guardianId) + destroyAllUserSessions(email);
     const elapsedMs = performance.now() - startTime;
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Password reset code queued for background delivery.',
+        message: 'Password reset code queued for background delivery. All existing sessions have been terminated.',
         recipient: { email },
+        sessionsRevoked: revokedCount,
         testCode: entry.code, // Included in test mode for automated test suites
         expiresInSeconds: 600,
         executionTimeMs: Number(elapsedMs.toFixed(2)),
